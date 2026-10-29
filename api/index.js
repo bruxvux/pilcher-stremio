@@ -6,9 +6,9 @@ const axios = require('axios');
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '1.3.0',
+  version: '1.4.0',
   name: 'ZDF Rosamunde Pilcher Collection',
-  description: 'Complete cloud archive of 169 Rosamunde Pilcher films (1993-2026) with ZDF Mediathek and automated YouTube cloud streaming',
+  description: 'Streams Rosamunde Pilcher films directly from German public broadcasters (ZDF, 3sat, ORF) in official HD broadcast quality',
   resources: ['catalog', 'meta', 'stream'],
   types: ['movie'],
   idPrefixes: ['rp_'],
@@ -16,7 +16,7 @@ const manifest = {
     {
       type: 'movie',
       id: 'rp_zdf_catalog',
-      name: 'Rosamunde Pilcher (Cloud Archive)',
+      name: 'Rosamunde Pilcher (ZDF & Mediathek)',
       extra: [
         { name: 'search', isRequired: false }
       ]
@@ -25,7 +25,7 @@ const manifest = {
 };
 
 // ============================================================================
-// 2. COMPLETE EPISODE DATABASE (169 FILMS FROM 1993 TO 2026 WITH INDIVIDUAL COVERS)
+// 2. COMPLETE EPISODE DATABASE (169 FILMS)
 // ============================================================================
 const EPISODES = [
   {
@@ -1430,63 +1430,7 @@ builder.defineMetaHandler(async ({ type, id }) => {
 });
 
 // ============================================================================
-// 5. CLOUD RESOLVER: YOUTUBE FULL GERMAN MOVIE FALLBACK
-// ============================================================================
-async function searchYouTubeFilm(searchTitle) {
-  const query = `Rosamunde Pilcher ${searchTitle} ganzer film`;
-  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-
-  try {
-    const resp = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept-Language': 'de-DE,de;q=0.9,en;q=0.8'
-      },
-      timeout: 5000
-    });
-
-    const html = typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data);
-    const items = [];
-    const videoBlockRegex = /"videoRenderer":\{"videoId":"([a-zA-Z0-9_-]{11})".*?"title":\{"runs":\[\{"text":"([^"]+)"\}/g;
-    let match;
-    while ((match = videoBlockRegex.exec(html)) !== null) {
-      items.push({
-        id: match[1],
-        title: match[2]
-      });
-      if (items.length >= 8) break;
-    }
-
-    // Fallback regex if videoRenderer block pattern changes
-    if (items.length === 0) {
-      const simpleRegex = /"videoId":"([a-zA-Z0-9_-]{11})"/g;
-      const seen = new Set();
-      let m;
-      while ((m = simpleRegex.exec(html)) !== null) {
-        if (!seen.has(m[1])) {
-          seen.add(m[1]);
-          items.push({ id: m[1], title: query });
-        }
-        if (items.length >= 3) break;
-      }
-    }
-
-    if (items.length === 0) return null;
-
-    const stLower = searchTitle.toLowerCase();
-    const best = items.find(it => it.title.toLowerCase().includes(stLower)) ||
-                 items.find(it => it.title.toLowerCase().includes('pilcher')) ||
-                 items[0];
-
-    return best;
-  } catch (err) {
-    console.warn(`[YouTube Resolver] Error for "${searchTitle}":`, err.message);
-    return null;
-  }
-}
-
-// ============================================================================
-// 6. DYNAMIC STREAM HANDLER (ZDF MEDIATHEK + AUTOMATIC YOUTUBE CLOUD STREAMING)
+// 5. DYNAMIC STREAM HANDLER (OFFICIAL BROADCASTER HD STREAMS ONLY)
 // ============================================================================
 builder.defineStreamHandler(async ({ type, id }) => {
   if (type !== 'movie' || !id.startsWith('rp_')) {
@@ -1498,10 +1442,8 @@ builder.defineStreamHandler(async ({ type, id }) => {
     return { streams: [] };
   }
 
-  const streams = [];
   const searchTerm = episode.searchTitle || episode.name.replace(/^Rosamunde Pilcher:\s*/i, '');
 
-  // 1. First priority: Check German public broadcaster Mediatheken (ZDF, 3sat, ORF, SRF)
   try {
     const MEDIATHEK_API_URL = 'https://mediathekviewweb.de/api/query';
     const payload = {
@@ -1523,6 +1465,7 @@ builder.defineStreamHandler(async ({ type, id }) => {
 
     let results = response.data?.result?.results || [];
 
+    // Fallback: search with topic "Rosamunde Pilcher" + title
     if (results.length === 0) {
       const fallbackPayload = {
         queries: [
@@ -1542,54 +1485,47 @@ builder.defineStreamHandler(async ({ type, id }) => {
       results = response.data?.result?.results || [];
     }
 
-    if (results && results.length > 0) {
-      const fullMovie = results.find(item => {
-        const titleLower = (item.title || '').toLowerCase();
-        const isAd = titleLower.includes('audiodeskription');
-        const isTrailer = titleLower.includes('trailer') || titleLower.includes('darum geht') || item.duration < 1800;
-        return !isAd && !isTrailer;
-      });
+    if (!results || results.length === 0) {
+      return { streams: [] };
+    }
 
-      const selectedItem = fullMovie || results[0];
-      const streamUrl = selectedItem.url_video_hd || selectedItem.url_video;
+    // Filter out short preview teasers / trailers and Audiodeskription (AD) if regular feature exists
+    const fullMovie = results.find(item => {
+      const titleLower = (item.title || '').toLowerCase();
+      const isAd = titleLower.includes('audiodeskription');
+      const isTrailer = titleLower.includes('trailer') || titleLower.includes('darum geht') || item.duration < 1800;
+      return !isAd && !isTrailer;
+    });
 
-      if (streamUrl) {
-        const channelName = selectedItem.channel || 'ZDF';
-        streams.push({
+    const selectedItem = fullMovie || results[0];
+    const streamUrl = selectedItem.url_video_hd || selectedItem.url_video;
+
+    if (!streamUrl) {
+      return { streams: [] };
+    }
+
+    const channelName = selectedItem.channel || 'ZDF';
+
+    return {
+      streams: [
+        {
           name: `${channelName}mediathek`,
           title: `${channelName}mediathek (HD German)`,
           url: streamUrl,
           behaviorHints: {
             notWebReady: false
           }
-        });
-      }
-    }
+        }
+      ]
+    };
   } catch (err) {
     console.warn(`[MediathekView] Query error for "${searchTerm}":`, err.message);
+    return { streams: [] };
   }
-
-  // 2. Second priority: Automatic YouTube Cloud Resolver for depublished/archived films
-  if (streams.length === 0) {
-    try {
-      const ytResult = await searchYouTubeFilm(searchTerm);
-      if (ytResult && ytResult.id) {
-        streams.push({
-          name: 'YouTube Cloud',
-          title: `YouTube: ${ytResult.title || 'Ganzer Film (Deutsch)'}`,
-          ytId: ytResult.id
-        });
-      }
-    } catch (err) {
-      console.warn(`[YouTube Fallback] Error for "${searchTerm}":`, err.message);
-    }
-  }
-
-  return { streams };
 });
 
 // ============================================================================
-// 7. VERCEL SERVERLESS EXPORT
+// 6. VERCEL SERVERLESS EXPORT & WEB DASHBOARD
 // ============================================================================
 const addonInterface = builder.getInterface();
 const proto = Object.getPrototypeOf(addonInterface);
@@ -1617,25 +1553,31 @@ module.exports = (req, res) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ZDF Rosamunde Pilcher Collection - Stremio Add-on</title>
+  <title>ZDF Rosamunde Pilcher Collection</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f1015; color: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; }
-    .card { background: #1a1c23; border: 1px solid #2d3139; border-radius: 12px; padding: 36px 28px; max-width: 500px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    .card { background: #1a1c23; border: 1px solid #2d3139; border-radius: 12px; padding: 36px 28px; max-width: 580px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
     h1 { color: #8a5cf6; margin-top: 0; font-size: 1.6rem; }
     p { color: #a0a5b5; line-height: 1.5; margin-bottom: 24px; }
-    .btn { display: block; background: #8a5cf6; color: #ffffff; text-decoration: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; transition: background 0.2s; margin-bottom: 20px; }
+    .btn { display: inline-block; background: #8a5cf6; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 1rem; transition: background 0.2s; margin-bottom: 20px; }
     .btn:hover { background: #7c4ee8; }
-    .manifest { font-size: 0.85rem; color: #707585; word-break: break-all; }
+    .manifest { font-size: 0.85rem; color: #707585; word-break: break-all; margin-bottom: 20px; }
     code { background: #252833; padding: 4px 8px; border-radius: 4px; color: #e2e8f0; }
+    .info-box { background: #14161c; border: 1px solid #22252e; border-radius: 8px; padding: 16px; text-align: left; font-size: 0.85rem; color: #94a3b8; line-height: 1.6; }
+    .info-box h3 { color: #e2e8f0; margin-top: 0; margin-bottom: 8px; font-size: 0.95rem; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>ZDF Rosamunde Pilcher Collection</h1>
-    <p>Complete cloud archive of ${EPISODES.length} Rosamunde Pilcher films with ZDF Mediathek and automated YouTube cloud streaming.</p>
+    <p>Streams all 169 Rosamunde Pilcher films directly from German public broadcaster servers (ZDF, 3sat, ORF) in official 1080p HD quality.</p>
     <a class="btn" href="${stremioUrl}">Install in Stremio</a>
     <div class="manifest">
       Manifest URL: <br><br><code>${manifestUrl}</code>
+    </div>
+    <div class="info-box">
+      <h3>🟢 29 Films Live & Downloadable Right Now</h3>
+      ZDF rotates films based on their weekly TV broadcast schedule. Whenever an episode airs on ZDF, ZDFneo, or 3sat, it automatically unlocks in your add-on for 30–90 days.
     </div>
   </div>
 </body>
