@@ -6,9 +6,9 @@ const axios = require('axios');
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '1.2.0',
+  version: '1.3.0',
   name: 'ZDF Rosamunde Pilcher Collection',
-  description: 'Complete collection of 169 Rosamunde Pilcher films (1993-2026) directly from German public broadcasters (ZDF, 3sat, ORF) with individual covers',
+  description: 'Complete cloud archive of 169 Rosamunde Pilcher films (1993-2026) with ZDF Mediathek and automated YouTube cloud streaming',
   resources: ['catalog', 'meta', 'stream'],
   types: ['movie'],
   idPrefixes: ['rp_'],
@@ -16,7 +16,7 @@ const manifest = {
     {
       type: 'movie',
       id: 'rp_zdf_catalog',
-      name: 'Rosamunde Pilcher (ZDF & Mediathek)',
+      name: 'Rosamunde Pilcher (Cloud Archive)',
       extra: [
         { name: 'search', isRequired: false }
       ]
@@ -1430,9 +1430,64 @@ builder.defineMetaHandler(async ({ type, id }) => {
 });
 
 // ============================================================================
-// 5. DYNAMIC STREAM HANDLER
+// 5. CLOUD RESOLVER: YOUTUBE FULL GERMAN MOVIE FALLBACK
 // ============================================================================
-// Queries MediathekViewWeb for live HLS / MP4 video streams across public broadcasters (ZDF, 3sat, ORF, SRF)
+async function searchYouTubeFilm(searchTitle) {
+  const query = `Rosamunde Pilcher ${searchTitle} ganzer film`;
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+
+  try {
+    const resp = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'de-DE,de;q=0.9,en;q=0.8'
+      },
+      timeout: 5000
+    });
+
+    const html = typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data);
+    const items = [];
+    const videoBlockRegex = /"videoRenderer":\{"videoId":"([a-zA-Z0-9_-]{11})".*?"title":\{"runs":\[\{"text":"([^"]+)"\}/g;
+    let match;
+    while ((match = videoBlockRegex.exec(html)) !== null) {
+      items.push({
+        id: match[1],
+        title: match[2]
+      });
+      if (items.length >= 8) break;
+    }
+
+    // Fallback regex if videoRenderer block pattern changes
+    if (items.length === 0) {
+      const simpleRegex = /"videoId":"([a-zA-Z0-9_-]{11})"/g;
+      const seen = new Set();
+      let m;
+      while ((m = simpleRegex.exec(html)) !== null) {
+        if (!seen.has(m[1])) {
+          seen.add(m[1]);
+          items.push({ id: m[1], title: query });
+        }
+        if (items.length >= 3) break;
+      }
+    }
+
+    if (items.length === 0) return null;
+
+    const stLower = searchTitle.toLowerCase();
+    const best = items.find(it => it.title.toLowerCase().includes(stLower)) ||
+                 items.find(it => it.title.toLowerCase().includes('pilcher')) ||
+                 items[0];
+
+    return best;
+  } catch (err) {
+    console.warn(`[YouTube Resolver] Error for "${searchTitle}":`, err.message);
+    return null;
+  }
+}
+
+// ============================================================================
+// 6. DYNAMIC STREAM HANDLER (ZDF MEDIATHEK + AUTOMATIC YOUTUBE CLOUD STREAMING)
+// ============================================================================
 builder.defineStreamHandler(async ({ type, id }) => {
   if (type !== 'movie' || !id.startsWith('rp_')) {
     return { streams: [] };
@@ -1443,11 +1498,12 @@ builder.defineStreamHandler(async ({ type, id }) => {
     return { streams: [] };
   }
 
+  const streams = [];
+  const searchTerm = episode.searchTitle || episode.name.replace(/^Rosamunde Pilcher:\s*/i, '');
+
+  // 1. First priority: Check German public broadcaster Mediatheken (ZDF, 3sat, ORF, SRF)
   try {
     const MEDIATHEK_API_URL = 'https://mediathekviewweb.de/api/query';
-    const searchTerm = episode.searchTitle || episode.name.replace(/^Rosamunde Pilcher:\s*/i, '');
-
-    // Search public broadcasters for this title
     const payload = {
       queries: [
         {
@@ -1462,23 +1518,16 @@ builder.defineStreamHandler(async ({ type, id }) => {
 
     let response = await axios.post(MEDIATHEK_API_URL, payload, {
       headers: { 'Content-Type': 'application/json' },
-      timeout: 10000
+      timeout: 6000
     });
 
     let results = response.data?.result?.results || [];
 
-    // Fallback: search with topic "Rosamunde Pilcher" + title
     if (results.length === 0) {
       const fallbackPayload = {
         queries: [
-          {
-            fields: ['topic'],
-            query: 'Rosamunde Pilcher'
-          },
-          {
-            fields: ['title'],
-            query: searchTerm
-          }
+          { fields: ['topic'], query: 'Rosamunde Pilcher' },
+          { fields: ['title'], query: searchTerm }
         ],
         sortBy: 'timestamp',
         sortOrder: 'desc',
@@ -1487,53 +1536,60 @@ builder.defineStreamHandler(async ({ type, id }) => {
 
       response = await axios.post(MEDIATHEK_API_URL, fallbackPayload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 10000
+        timeout: 6000
       });
 
       results = response.data?.result?.results || [];
     }
 
-    if (!results || results.length === 0) {
-      console.warn(`[Rosamunde Pilcher] No stream currently active in public mediathek for: "${episode.name}"`);
-      return { streams: [] };
-    }
+    if (results && results.length > 0) {
+      const fullMovie = results.find(item => {
+        const titleLower = (item.title || '').toLowerCase();
+        const isAd = titleLower.includes('audiodeskription');
+        const isTrailer = titleLower.includes('trailer') || titleLower.includes('darum geht') || item.duration < 1800;
+        return !isAd && !isTrailer;
+      });
 
-    // Filter out short preview teasers / trailers and Audiodeskription (AD) if regular feature exists
-    const fullMovie = results.find(item => {
-      const titleLower = (item.title || '').toLowerCase();
-      const isAd = titleLower.includes('audiodeskription');
-      const isTrailer = titleLower.includes('trailer') || titleLower.includes('darum geht') || item.duration < 1800;
-      return !isAd && !isTrailer;
-    });
+      const selectedItem = fullMovie || results[0];
+      const streamUrl = selectedItem.url_video_hd || selectedItem.url_video;
 
-    const selectedItem = fullMovie || results[0];
-    const streamUrl = selectedItem.url_video_hd || selectedItem.url_video;
-    if (!streamUrl) {
-      return { streams: [] };
-    }
-
-    const channelName = selectedItem.channel || 'ZDF';
-
-    return {
-      streams: [
-        {
+      if (streamUrl) {
+        const channelName = selectedItem.channel || 'ZDF';
+        streams.push({
           name: `${channelName}mediathek`,
           title: `${channelName}mediathek (HD German)`,
           url: streamUrl,
           behaviorHints: {
             notWebReady: false
           }
-        }
-      ]
-    };
-  } catch (error) {
-    console.error(`[Rosamunde Pilcher] Error querying MediathekViewWeb for "${episode.name}":`, error.message);
-    return { streams: [] };
+        });
+      }
+    }
+  } catch (err) {
+    console.warn(`[MediathekView] Query error for "${searchTerm}":`, err.message);
   }
+
+  // 2. Second priority: Automatic YouTube Cloud Resolver for depublished/archived films
+  if (streams.length === 0) {
+    try {
+      const ytResult = await searchYouTubeFilm(searchTerm);
+      if (ytResult && ytResult.id) {
+        streams.push({
+          name: 'YouTube Cloud',
+          title: `YouTube: ${ytResult.title || 'Ganzer Film (Deutsch)'}`,
+          ytId: ytResult.id
+        });
+      }
+    } catch (err) {
+      console.warn(`[YouTube Fallback] Error for "${searchTerm}":`, err.message);
+    }
+  }
+
+  return { streams };
 });
 
 // ============================================================================
-// 6. VERCEL SERVERLESS EXPORT
+// 7. VERCEL SERVERLESS EXPORT
 // ============================================================================
 const addonInterface = builder.getInterface();
 const proto = Object.getPrototypeOf(addonInterface);
@@ -1549,7 +1605,6 @@ if (typeof addonInterface.createRouter !== 'function') {
 const getRouter = builder.getInterface().createRouter();
 
 module.exports = (req, res) => {
-  // If user visits the root URL in a browser, render a clean landing page with an install button
   if (!req.url || req.url === '/' || req.url === '/index.html') {
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'pilcher-stremio-tfd7.vercel.app';
     const manifestUrl = `https://${host}/manifest.json`;
@@ -1577,7 +1632,7 @@ module.exports = (req, res) => {
 <body>
   <div class="card">
     <h1>ZDF Rosamunde Pilcher Collection</h1>
-    <p>Complete archive of ${EPISODES.length} Rosamunde Pilcher films directly from German public broadcasters (ZDF, 3sat, ORF) with individual covers.</p>
+    <p>Complete cloud archive of ${EPISODES.length} Rosamunde Pilcher films with ZDF Mediathek and automated YouTube cloud streaming.</p>
     <a class="btn" href="${stremioUrl}">Install in Stremio</a>
     <div class="manifest">
       Manifest URL: <br><br><code>${manifestUrl}</code>
@@ -1588,7 +1643,6 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Handle all Stremio API endpoints (/manifest.json, /catalog/..., /meta/..., /stream/...)
   getRouter(req, res, () => {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
