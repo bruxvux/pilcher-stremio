@@ -1,0 +1,24 @@
+{
+  "name": "rosamunde-pilcher-stremio-addon",
+  "version": "1.0.0",
+  "description": "Stremio add-on to stream Rosamunde Pilcher films directly from ZDFmediathek deployed on Vercel",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "vercel dev"
+  },
+  "keywords": [
+    "stremio",
+    "stremio-addon",
+    "zdf",
+    "zdfmediathek",
+    "rosamunde-pilcher",
+    "vercel"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@stremio/stremio-addon-sdk": "^1.6.14",
+    "axios": "^1.7.9"
+  }
+}
