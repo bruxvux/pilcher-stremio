@@ -1,7 +1,7 @@
 {
   "name": "rosamunde-pilcher-stremio-addon",
-  "version": "1.8.0",
-  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (tt0907694) with 🟢 Green Circle visual indicators, real air dates, and episode covers",
+  "version": "1.9.0",
+  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (tt0907694) with 🟢 ZDF and 🟠 YouTube stream indicators, real dates, and covers",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",

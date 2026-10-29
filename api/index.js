@@ -2,13 +2,13 @@ const { addonBuilder, getRouter: sdkGetRouter } = require('stremio-addon-sdk');
 const axios = require('axios');
 
 // ============================================================================
-// 1. MANIFEST CONFIGURATION (v1.8.0)
+// 1. MANIFEST CONFIGURATION (v1.9.0)
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '1.8.0',
-  name: 'Rosamunde Pilcher (🟢 ZDF & YouTube HD)',
-  description: 'Komplette Rosamunde Pilcher Sammlung mit allen 169 Verfilmungen. Episoden mit 🟢 funktionieren zu 100% in offizieller 1080p HD Qualität aus der ZDFmediathek.',
+  version: '1.9.0',
+  name: 'Rosamunde Pilcher (🟢 ZDF & 🟠 YouTube HD)',
+  description: 'Komplette Rosamunde Pilcher Sammlung (169 Filme). 🟢 = ZDFmediathek HD (100% funktioniert), 🟠 = YouTube voller Spielfilm.',
   resources: ['catalog', 'meta', 'stream'],
   types: ['series', 'movie'],
   idPrefixes: ['tt0907694', 'tt', 'rp_'],
@@ -16,7 +16,7 @@ const manifest = {
     {
       type: 'series',
       id: 'rp_zdf_series_catalog',
-      name: '🟢 Rosamunde Pilcher (Komplette Serie)',
+      name: '🟢🟠 Rosamunde Pilcher (Komplette Serie)',
       extra: [
         { name: 'search', isRequired: false }
       ]
@@ -24,7 +24,7 @@ const manifest = {
     {
       type: 'movie',
       id: 'rp_zdf_catalog',
-      name: '🟢 Rosamunde Pilcher (Einzelfilme)',
+      name: '🟢🟠 Rosamunde Pilcher (Einzelfilme)',
       extra: [
         { name: 'search', isRequired: false }
       ]
@@ -33,7 +33,7 @@ const manifest = {
 };
 
 // ============================================================================
-// 2. ENRICHED METADATA DATABASES (REAL BROADCAST DATES & COVERS)
+// 2. ENRICHED METADATA DATABASES (🟢 ZDF & 🟠 YOUTUBE INDICATORS)
 // ============================================================================
 const SERIES_VIDEOS = [
   {
@@ -64,15 +64,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:3",
-    "name": "Karussell des Lebens",
-    "title": "Karussell des Lebens",
+    "name": "🟠 Karussell des Lebens",
+    "title": "🟠 Karussell des Lebens",
     "season": 1,
     "number": 3,
     "episode": 3,
     "released": "1994-11-13T00:00:00.000Z",
     "firstAired": "1994-11-13T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0110245/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.2"
   },
   {
@@ -90,54 +90,54 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:5",
-    "name": "Das Ende eines Sommers",
-    "title": "Das Ende eines Sommers",
+    "name": "🟠 Das Ende eines Sommers",
+    "title": "🟠 Das Ende eines Sommers",
     "season": 1,
     "number": 5,
     "episode": 5,
     "released": "1995-02-05T00:00:00.000Z",
     "firstAired": "1995-02-05T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0123821/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.4"
   },
   {
     "id": "tt0907694:1:6",
-    "name": "Sommer am Meer",
-    "title": "Sommer am Meer",
+    "name": "🟠 Sommer am Meer",
+    "title": "🟠 Sommer am Meer",
     "season": 1,
     "number": 6,
     "episode": 6,
     "released": "1995-10-15T00:00:00.000Z",
     "firstAired": "1995-10-15T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0114498/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "6.2"
   },
   {
     "id": "tt0907694:1:7",
-    "name": "Schlafender Tiger",
-    "title": "Schlafender Tiger",
+    "name": "🟠 Schlafender Tiger",
+    "title": "🟠 Schlafender Tiger",
     "season": 1,
     "number": 7,
     "episode": 7,
     "released": "1995-11-05T00:00:00.000Z",
     "firstAired": "1995-11-05T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0114353/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "6.1"
   },
   {
     "id": "tt0907694:1:8",
-    "name": "Wolken am Horizont",
-    "title": "Wolken am Horizont",
+    "name": "🟠 Wolken am Horizont",
+    "title": "🟠 Wolken am Horizont",
     "season": 1,
     "number": 8,
     "episode": 8,
     "released": "1995-01-01T00:00:00.000Z",
     "firstAired": "1995-01-01T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0126124/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.5"
   },
   {
@@ -155,15 +155,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:10",
-    "name": "Lichterspiele",
-    "title": "Lichterspiele",
+    "name": "🟠 Lichterspiele",
+    "title": "🟠 Lichterspiele",
     "season": 1,
     "number": 10,
     "episode": 10,
     "released": "1996-03-03T00:00:00.000Z",
     "firstAired": "1996-03-03T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0116870/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.1"
   },
   {
@@ -194,15 +194,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:13",
-    "name": "Das Haus an der Küste",
-    "title": "Das Haus an der Küste",
+    "name": "🟠 Das Haus an der Küste",
+    "title": "🟠 Das Haus an der Küste",
     "season": 1,
     "number": 13,
     "episode": 13,
     "released": "1996-11-03T00:00:00.000Z",
     "firstAired": "1996-11-03T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0116498/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.7"
   },
   {
@@ -233,15 +233,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:16",
-    "name": "Irrwege des Herzens",
-    "title": "Irrwege des Herzens",
+    "name": "🟠 Irrwege des Herzens",
+    "title": "🟠 Irrwege des Herzens",
     "season": 1,
     "number": 16,
     "episode": 16,
     "released": "1997-03-09T00:00:00.000Z",
     "firstAired": "1997-03-09T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0119384/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.5"
   },
   {
@@ -259,41 +259,41 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:18",
-    "name": "Die zweite Chance",
-    "title": "Die zweite Chance",
+    "name": "🟠 Die zweite Chance",
+    "title": "🟠 Die zweite Chance",
     "season": 1,
     "number": 18,
     "episode": 18,
     "released": "1997-10-12T00:00:00.000Z",
     "firstAired": "1997-10-12T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0128860/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "3.7"
   },
   {
     "id": "tt0907694:1:19",
-    "name": "Zwei Schwestern",
-    "title": "Zwei Schwestern",
+    "name": "🟠 Zwei Schwestern",
+    "title": "🟠 Zwei Schwestern",
     "season": 1,
     "number": 19,
     "episode": 19,
     "released": "1997-11-16T00:00:00.000Z",
     "firstAired": "1997-11-16T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0135071/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.1"
   },
   {
     "id": "tt0907694:1:20",
-    "name": "Der Preis der Liebe",
-    "title": "Der Preis der Liebe",
+    "name": "🟠 Der Preis der Liebe",
+    "title": "🟠 Der Preis der Liebe",
     "season": 1,
     "number": 20,
     "episode": 20,
     "released": "1998-02-15T00:00:00.000Z",
     "firstAired": "1998-02-15T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0146041/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.3"
   },
   {
@@ -324,106 +324,106 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:23",
-    "name": "Rückkehr ins Paradies",
-    "title": "Rückkehr ins Paradies",
+    "name": "🟠 Rückkehr ins Paradies",
+    "title": "🟠 Rückkehr ins Paradies",
     "season": 1,
     "number": 23,
     "episode": 23,
     "released": "1998-09-20T00:00:00.000Z",
     "firstAired": "1998-09-20T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0170520/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.5"
   },
   {
     "id": "tt0907694:1:24",
-    "name": "Dornen im Tal der Blumen",
-    "title": "Dornen im Tal der Blumen",
+    "name": "🟠 Dornen im Tal der Blumen",
+    "title": "🟠 Dornen im Tal der Blumen",
     "season": 1,
     "number": 24,
     "episode": 24,
     "released": "1998-12-13T00:00:00.000Z",
     "firstAired": "1998-12-13T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0177180/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.6"
   },
   {
     "id": "tt0907694:1:25",
-    "name": "Melodie der Herzen",
-    "title": "Melodie der Herzen",
+    "name": "🟠 Melodie der Herzen",
+    "title": "🟠 Melodie der Herzen",
     "season": 1,
     "number": 25,
     "episode": 25,
     "released": "1998-12-25T00:00:00.000Z",
     "firstAired": "1998-12-25T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0181794/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.2"
   },
   {
     "id": "tt0907694:1:26",
-    "name": "Magie der Liebe",
-    "title": "Magie der Liebe",
+    "name": "🟠 Magie der Liebe",
+    "title": "🟠 Magie der Liebe",
     "season": 1,
     "number": 26,
     "episode": 26,
     "released": "1999-01-17T00:00:00.000Z",
     "firstAired": "1999-01-17T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0184868/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.5"
   },
   {
     "id": "tt0907694:1:27",
-    "name": "Rosen im Sturm",
-    "title": "Rosen im Sturm",
+    "name": "🟠 Rosen im Sturm",
+    "title": "🟠 Rosen im Sturm",
     "season": 1,
     "number": 27,
     "episode": 27,
     "released": "1999-02-14T00:00:00.000Z",
     "firstAired": "1999-02-14T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0188183/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.8"
   },
   {
     "id": "tt0907694:1:28",
-    "name": "Das große Erbe: Teil 1",
-    "title": "Das große Erbe: Teil 1",
+    "name": "🟠 Das große Erbe: Teil 1",
+    "title": "🟠 Das große Erbe: Teil 1",
     "season": 1,
     "number": 28,
     "episode": 28,
     "released": "1999-05-23T00:00:00.000Z",
     "firstAired": "1999-05-23T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt15740730/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "0"
   },
   {
     "id": "tt0907694:1:29",
-    "name": "Das große Erbe: Teil 2",
-    "title": "Das große Erbe: Teil 2",
+    "name": "🟠 Das große Erbe: Teil 2",
+    "title": "🟠 Das große Erbe: Teil 2",
     "season": 1,
     "number": 29,
     "episode": 29,
     "released": "1999-05-24T00:00:00.000Z",
     "firstAired": "1999-05-24T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt15740738/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "0"
   },
   {
     "id": "tt0907694:1:30",
-    "name": "Klippen der Liebe",
-    "title": "Klippen der Liebe",
+    "name": "🟠 Klippen der Liebe",
+    "title": "🟠 Klippen der Liebe",
     "season": 1,
     "number": 30,
     "episode": 30,
     "released": "1999-09-19T00:00:00.000Z",
     "firstAired": "1999-09-19T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0217605/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "3.7"
   },
   {
@@ -441,15 +441,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:32",
-    "name": "Blüte des Lebens",
-    "title": "Blüte des Lebens",
+    "name": "🟠 Blüte des Lebens",
+    "title": "🟠 Blüte des Lebens",
     "season": 1,
     "number": 32,
     "episode": 32,
     "released": "1999-12-12T00:00:00.000Z",
     "firstAired": "1999-12-12T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0226390/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "3.5"
   },
   {
@@ -506,15 +506,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:37",
-    "name": "Im Licht des Feuers",
-    "title": "Im Licht des Feuers",
+    "name": "🟠 Im Licht des Feuers",
+    "title": "🟠 Im Licht des Feuers",
     "season": 1,
     "number": 37,
     "episode": 37,
     "released": "2000-12-17T00:00:00.000Z",
     "firstAired": "2000-12-17T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0271760/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.6"
   },
   {
@@ -571,15 +571,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:42",
-    "name": "Blumen im Regen",
-    "title": "Blumen im Regen",
+    "name": "🟠 Blumen im Regen",
+    "title": "🟠 Blumen im Regen",
     "season": 1,
     "number": 42,
     "episode": 42,
     "released": "2001-12-16T00:00:00.000Z",
     "firstAired": "2001-12-16T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0304642/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "3.9"
   },
   {
@@ -623,15 +623,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:46",
-    "name": "Bis ans Ende der Welt",
-    "title": "Bis ans Ende der Welt",
+    "name": "🟠 Bis ans Ende der Welt",
+    "title": "🟠 Bis ans Ende der Welt",
     "season": 1,
     "number": 46,
     "episode": 46,
     "released": "2002-12-08T00:00:00.000Z",
     "firstAired": "2002-12-08T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0345873/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.6"
   },
   {
@@ -779,15 +779,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:58",
-    "name": "Dem Himmel so nah",
-    "title": "Dem Himmel so nah",
+    "name": "🟠 Dem Himmel so nah",
+    "title": "🟠 Dem Himmel so nah",
     "season": 1,
     "number": 58,
     "episode": 58,
     "released": "2004-12-25T00:00:00.000Z",
     "firstAired": "2004-12-25T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0450116/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.6"
   },
   {
@@ -831,15 +831,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:62",
-    "name": "Über den Wolken",
-    "title": "Über den Wolken",
+    "name": "🟠 Über den Wolken",
+    "title": "🟠 Über den Wolken",
     "season": 1,
     "number": 62,
     "episode": 62,
     "released": "2005-10-02T00:00:00.000Z",
     "firstAired": "2005-10-02T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0491128/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "3.5"
   },
   {
@@ -922,15 +922,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:69",
-    "name": "Und plötzlich war es Liebe",
-    "title": "Und plötzlich war es Liebe",
+    "name": "🟠 Und plötzlich war es Liebe",
+    "title": "🟠 Und plötzlich war es Liebe",
     "season": 1,
     "number": 69,
     "episode": 69,
     "released": "2006-12-03T00:00:00.000Z",
     "firstAired": "2006-12-03T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt0903964/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.2"
   },
   {
@@ -1013,28 +1013,28 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:77",
-    "name": "Aus Liebe und Leidenschaft",
-    "title": "Aus Liebe und Leidenschaft",
+    "name": "🟠 Aus Liebe und Leidenschaft",
+    "title": "🟠 Aus Liebe und Leidenschaft",
     "season": 1,
     "number": 77,
     "episode": 77,
     "released": "2007-12-02T00:00:00.000Z",
     "firstAired": "2007-12-02T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1140926/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.8"
   },
   {
     "id": "tt0907694:1:78",
-    "name": "Wind über der See",
-    "title": "Wind über der See",
+    "name": "🟠 Wind über der See",
+    "title": "🟠 Wind über der See",
     "season": 1,
     "number": 78,
     "episode": 78,
     "released": "2007-12-23T00:00:00.000Z",
     "firstAired": "2007-12-23T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1150986/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4"
   },
   {
@@ -1065,15 +1065,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:81",
-    "name": "Herzen im Wind",
-    "title": "Herzen im Wind",
+    "name": "🟠 Herzen im Wind",
+    "title": "🟠 Herzen im Wind",
     "season": 1,
     "number": 81,
     "episode": 81,
     "released": "2008-12-21T00:00:00.000Z",
     "firstAired": "2008-12-21T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1178399/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.3"
   },
   {
@@ -1091,15 +1091,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:85",
-    "name": "Herzenssehnsucht",
-    "title": "Herzenssehnsucht",
+    "name": "🟠 Herzenssehnsucht",
+    "title": "🟠 Herzenssehnsucht",
     "season": 1,
     "number": 85,
     "episode": 85,
     "released": "2009-01-14T00:00:00.000Z",
     "firstAired": "2009-01-14T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1178401/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.9"
   },
   {
@@ -1138,7 +1138,7 @@ const SERIES_VIDEOS = [
     "released": "2009-09-16T00:00:00.000Z",
     "firstAired": "2009-09-16T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/liebe-gegen-den-rest-der-welt-102~1920x1080?cb=1747395872987",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte.",
     "rating": "4.7"
   },
   {
@@ -1151,7 +1151,7 @@ const SERIES_VIDEOS = [
     "released": "2009-10-25T00:00:00.000Z",
     "firstAired": "2009-10-25T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/wiedersehen-in-rose-abbey-100~1920x1080?cb=1746798390082",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter.",
     "rating": "4.5"
   },
   {
@@ -1164,7 +1164,7 @@ const SERIES_VIDEOS = [
     "released": "2009-11-29T00:00:00.000Z",
     "firstAired": "2009-11-29T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/lass-es-liebe-sein-100~1920x1080?cb=1746450048706",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander.",
     "rating": "5.3"
   },
   {
@@ -1208,15 +1208,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:96",
-    "name": "Wenn das Herz zerbricht",
-    "title": "Wenn das Herz zerbricht",
+    "name": "🟠 Wenn das Herz zerbricht",
+    "title": "🟠 Wenn das Herz zerbricht",
     "season": 1,
     "number": 96,
     "episode": 96,
     "released": "2010-10-06T00:00:00.000Z",
     "firstAired": "2010-10-06T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1670117/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.8"
   },
   {
@@ -1247,15 +1247,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:99",
-    "name": "Herzensfragen",
-    "title": "Herzensfragen",
+    "name": "🟠 Herzensfragen",
+    "title": "🟠 Herzensfragen",
     "season": 1,
     "number": 99,
     "episode": 99,
     "released": "2011-01-02T00:00:00.000Z",
     "firstAired": "2011-01-02T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt1794473/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.7"
   },
   {
@@ -1281,33 +1281,33 @@ const SERIES_VIDEOS = [
     "released": "2011-09-07T00:00:00.000Z",
     "firstAired": "2011-09-07T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/verlobt-verliebt-verwirrt-100~1920x1080?cb=1745830743700",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist.",
     "rating": "5.2"
   },
   {
     "id": "tt0907694:1:104",
-    "name": "Der gestohlene Sommer",
-    "title": "Der gestohlene Sommer",
+    "name": "🟠 Der gestohlene Sommer",
+    "title": "🟠 Der gestohlene Sommer",
     "season": 1,
     "number": 104,
     "episode": 104,
     "released": "2011-09-28T00:00:00.000Z",
     "firstAired": "2011-09-28T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt2050247/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "4.9"
   },
   {
     "id": "tt0907694:1:105",
-    "name": "🟢 Englischer Wein",
-    "title": "🟢 Englischer Wein",
+    "name": "🟢🟠 Englischer Wein",
+    "title": "🟢🟠 Englischer Wein",
     "season": 1,
     "number": 105,
     "episode": 105,
     "released": "2011-11-20T00:00:00.000Z",
     "firstAired": "2011-11-20T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-englischer-wein-104~1920x1080?cb=1744711026467",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen.",
+    "overview": "🟢 [ZDFmediathek 1080p] • 🟠 [YouTube HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen.",
     "rating": "5.4"
   },
   {
@@ -1333,7 +1333,7 @@ const SERIES_VIDEOS = [
     "released": "2012-01-15T00:00:00.000Z",
     "firstAired": "2012-01-15T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/ungezuegelt-ins-glueck-100~1920x1080?cb=1744907251956",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern.",
     "rating": "5.6"
   },
   {
@@ -1346,20 +1346,20 @@ const SERIES_VIDEOS = [
     "released": "2012-04-04T00:00:00.000Z",
     "firstAired": "2012-04-04T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/das-geheimnis-der-weissen-taube-100~1920x1080?cb=1746022269147",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit.",
     "rating": "5.2"
   },
   {
     "id": "tt0907694:1:111",
-    "name": "🟢 Die falsche Nonne",
-    "title": "🟢 Die falsche Nonne",
+    "name": "🟢🟠 Die falsche Nonne",
+    "title": "🟢🟠 Die falsche Nonne",
     "season": 1,
     "number": 111,
     "episode": 111,
     "released": "2012-09-19T00:00:00.000Z",
     "firstAired": "2012-09-19T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-die-falsche-nonne-104~1920x1080?cb=1793023905964",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen.",
+    "overview": "🟢 [ZDFmediathek 1080p] • 🟠 [YouTube HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen.",
     "rating": "5.4"
   },
   {
@@ -1372,7 +1372,7 @@ const SERIES_VIDEOS = [
     "released": "2012-10-10T00:00:00.000Z",
     "firstAired": "2012-10-10T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/in-der-mitte-des-lebens-100~1920x1080?cb=1578559755191",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken.",
     "rating": "5.8"
   },
   {
@@ -1403,15 +1403,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:115",
-    "name": "Eine Frage der Ehre",
-    "title": "Eine Frage der Ehre",
+    "name": "🟠 Eine Frage der Ehre",
+    "title": "🟠 Eine Frage der Ehre",
     "season": 1,
     "number": 115,
     "episode": 115,
     "released": "2013-01-13T00:00:00.000Z",
     "firstAired": "2013-01-13T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt2592426/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5"
   },
   {
@@ -1424,7 +1424,7 @@ const SERIES_VIDEOS = [
     "released": "2013-03-27T00:00:00.000Z",
     "firstAired": "2013-03-27T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/die-frau-auf-der-klippe-100~1920x1080?cb=1793023515200",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall.",
     "rating": "5.5"
   },
   {
@@ -1450,7 +1450,7 @@ const SERIES_VIDEOS = [
     "released": "2013-09-08T00:00:00.000Z",
     "firstAired": "2013-09-08T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt3128154/img",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5"
   },
   {
@@ -1468,15 +1468,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:120",
-    "name": "Zu hoch geflogen",
-    "title": "Zu hoch geflogen",
+    "name": "🟠 Zu hoch geflogen",
+    "title": "🟠 Zu hoch geflogen",
     "season": 1,
     "number": 120,
     "episode": 120,
     "released": "2013-12-22T00:00:00.000Z",
     "firstAired": "2013-12-22T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt3443090/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.3"
   },
   {
@@ -1546,15 +1546,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:126",
-    "name": "Ghostwriter",
-    "title": "Ghostwriter",
+    "name": "🟠 Ghostwriter",
+    "title": "🟠 Ghostwriter",
     "season": 1,
     "number": 126,
     "episode": 126,
     "released": "2015-01-11T00:00:00.000Z",
     "firstAired": "2015-01-11T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt5921002/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.2"
   },
   {
@@ -1593,20 +1593,20 @@ const SERIES_VIDEOS = [
     "released": "2015-05-17T00:00:00.000Z",
     "firstAired": "2015-05-17T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rundum-gluecklich-100~1920x1080?cb=1738935862085",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume.",
     "rating": "5.2"
   },
   {
     "id": "tt0907694:1:130",
-    "name": "Vollkommen unerwartet",
-    "title": "Vollkommen unerwartet",
+    "name": "🟠 Vollkommen unerwartet",
+    "title": "🟠 Vollkommen unerwartet",
     "season": 1,
     "number": 130,
     "episode": 130,
     "released": "2015-10-04T00:00:00.000Z",
     "firstAired": "2015-10-04T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt5376696/img",
-    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟠 [YouTube HD Spielfilm] Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.9"
   },
   {
@@ -1619,7 +1619,7 @@ const SERIES_VIDEOS = [
     "released": "2015-11-22T00:00:00.000Z",
     "firstAired": "2015-11-22T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-liebe-diebe-diamanten-102~1920x1080?cb=1793024107343",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall.",
     "rating": "5.6"
   },
   {
@@ -1637,15 +1637,15 @@ const SERIES_VIDEOS = [
   },
   {
     "id": "tt0907694:1:133",
-    "name": "🟢 Lizenz zum Seitensprung",
-    "title": "🟢 Lizenz zum Seitensprung",
+    "name": "🟢🟠 Lizenz zum Seitensprung",
+    "title": "🟢🟠 Lizenz zum Seitensprung",
     "season": 1,
     "number": 133,
     "episode": 133,
     "released": "2016-02-07T00:00:00.000Z",
     "firstAired": "2016-02-07T00:00:00.000Z",
     "thumbnail": "https://images.metahub.space/poster/medium/tt5295330/img",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "overview": "🟢 [ZDFmediathek 1080p] • 🟠 [YouTube HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
     "rating": "5.5"
   },
   {
@@ -1671,7 +1671,7 @@ const SERIES_VIDEOS = [
     "released": "2016-04-24T00:00:00.000Z",
     "firstAired": "2016-04-24T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/doktor-und-drei-frauen-100~1920x1080?cb=1766147846819",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand.",
     "rating": "5.3"
   },
   {
@@ -1684,7 +1684,7 @@ const SERIES_VIDEOS = [
     "released": "2016-10-02T00:00:00.000Z",
     "firstAired": "2016-10-02T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-ex-und-liebe-102~1920x1080?cb=1680097215435",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm.",
     "rating": "5.7"
   },
   {
@@ -1697,7 +1697,7 @@ const SERIES_VIDEOS = [
     "released": "2016-11-12T00:00:00.000Z",
     "firstAired": "2016-11-12T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/erdbeeren-im-fruehling-106~1920x1080?cb=1696515866401",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen.",
     "rating": "5.7"
   },
   {
@@ -1736,7 +1736,7 @@ const SERIES_VIDEOS = [
     "released": "2017-02-26T00:00:00.000Z",
     "firstAired": "2017-02-26T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/fast-verheiratet-100~1920x1080?cb=1575469007851",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert.",
     "rating": "6.1"
   },
   {
@@ -1840,7 +1840,7 @@ const SERIES_VIDEOS = [
     "released": "2018-12-09T00:00:00.000Z",
     "firstAired": "2018-12-09T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-das-geheimnis-der-blumeninsel-102~1920x1080?cb=1544345904588",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen.",
     "rating": "5.6"
   },
   {
@@ -1879,7 +1879,7 @@ const SERIES_VIDEOS = [
     "released": "2019-05-26T00:00:00.000Z",
     "firstAired": "2019-05-26T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-schwiegertoechter-102~1920x1080?cb=1749544149996",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben.",
     "rating": "5"
   },
   {
@@ -1892,7 +1892,7 @@ const SERIES_VIDEOS = [
     "released": "2019-09-01T00:00:00.000Z",
     "firstAired": "2019-09-01T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/pralinen-zum-fruehstueck-102~1920x1080?cb=1781704277805",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen.",
     "rating": "5.6"
   },
   {
@@ -1918,7 +1918,7 @@ const SERIES_VIDEOS = [
     "released": "2019-12-01T00:00:00.000Z",
     "firstAired": "2019-12-01T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/magisch-bus-100~1920x1080?cb=1572876710440",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag.",
     "rating": "6"
   },
   {
@@ -1957,7 +1957,7 @@ const SERIES_VIDEOS = [
     "released": "2020-03-01T00:00:00.000Z",
     "firstAired": "2020-03-01T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/falschesleben-102~1920x1080?cb=1696515723171",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an.",
     "rating": "5.3"
   },
   {
@@ -1983,7 +1983,7 @@ const SERIES_VIDEOS = [
     "released": "2021-05-02T00:00:00.000Z",
     "firstAired": "2021-05-02T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/wie-verhext-102~1920x1080?cb=1751274370663",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will.",
     "rating": "5.1"
   },
   {
@@ -1996,7 +1996,7 @@ const SERIES_VIDEOS = [
     "released": "2021-09-05T00:00:00.000Z",
     "firstAired": "2021-09-05T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/herzenslaeufe-100~1920x1080?cb=1790922946174",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit.",
     "rating": "5.3"
   },
   {
@@ -2022,7 +2022,7 @@ const SERIES_VIDEOS = [
     "released": "2021-12-05T00:00:00.000Z",
     "firstAired": "2021-12-05T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-im-siebten-himmel-102~1920x1080?cb=1638535290427",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall.",
     "rating": "4.7"
   },
   {
@@ -2035,7 +2035,7 @@ const SERIES_VIDEOS = [
     "released": "2022-01-02T00:00:00.000Z",
     "firstAired": "2022-01-02T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/vier-luftballons-und-ein-todesfall-100~1920x1080?cb=1790581314387",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil.",
     "rating": "5.7"
   },
   {
@@ -2074,7 +2074,7 @@ const SERIES_VIDEOS = [
     "released": "2022-09-11T00:00:00.000Z",
     "firstAired": "2022-09-11T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/liebe-und-andere-schaetze-100~1920x1080?cb=1779100936024",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben.",
     "rating": "5.6"
   },
   {
@@ -2204,7 +2204,7 @@ const SERIES_VIDEOS = [
     "released": "2026-01-04T00:00:00.000Z",
     "firstAired": "2026-01-04T00:00:00.000Z",
     "thumbnail": "https://epg-image.zdf.de/fotobase-webdelivery/images/14639eee-55be-4062-8284-904f5faf3e73?layout=768x432",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen.",
     "rating": "5.9"
   },
   {
@@ -2217,7 +2217,7 @@ const SERIES_VIDEOS = [
     "released": "2026-04-12T00:00:00.000Z",
     "firstAired": "2026-04-12T00:00:00.000Z",
     "thumbnail": "https://www.zdf.de/assets/hero-pilcher-wo-die-liebe-aufhoert-100~1920x1080?cb=1776694369640",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück.",
     "rating": "5.1"
   },
   {
@@ -2230,7 +2230,7 @@ const SERIES_VIDEOS = [
     "released": "2026-09-06T00:00:00.000Z",
     "firstAired": "2026-09-06T00:00:00.000Z",
     "thumbnail": "https://epg-image.zdf.de/fotobase-webdelivery/images/45cdebaf-8fbe-498c-aafd-57730994f4d4?layout=768x432",
-    "overview": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding.",
+    "overview": "🟢 [ZDFmediathek 1080p HD] 🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding.",
     "rating": "4.9"
   }
 ];
@@ -3764,7 +3764,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Die Glücksbringerin",
     "searchTitle": "Die Glücksbringerin",
     "poster": "https://epg-image.zdf.de/fotobase-webdelivery/images/45cdebaf-8fbe-498c-aafd-57730994f4d4?layout=768x432",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding."
+    "description": "[🟢 VERFÜGBAR] Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding."
   },
   {
     "id": "rp_002",
@@ -3772,7 +3772,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Wo Liebe aufhört und wo sie beginnt",
     "searchTitle": "Wo Liebe aufhört und wo sie beginnt",
     "poster": "https://www.zdf.de/assets/hero-pilcher-wo-die-liebe-aufhoert-100~1920x1080?cb=1776694369640",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück."
+    "description": "[🟢 VERFÜGBAR] Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück."
   },
   {
     "id": "rp_003",
@@ -3780,7 +3780,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Einspruch für die Liebe",
     "searchTitle": "Einspruch für die Liebe",
     "poster": "https://epg-image.zdf.de/fotobase-webdelivery/images/14639eee-55be-4062-8284-904f5faf3e73?layout=768x432",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen."
+    "description": "[🟢 VERFÜGBAR] Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen."
   },
   {
     "id": "rp_004",
@@ -3788,7 +3788,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Ex & Liebe",
     "searchTitle": "Ex & Liebe",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-ex-und-liebe-102~1920x1080?cb=1680097215435",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm."
+    "description": "[🟢 VERFÜGBAR] Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm."
   },
   {
     "id": "rp_005",
@@ -3796,7 +3796,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Fast noch verheiratet",
     "searchTitle": "Fast noch verheiratet",
     "poster": "https://www.zdf.de/assets/fast-verheiratet-100~1920x1080?cb=1575469007851",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert."
+    "description": "[🟢 VERFÜGBAR] Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert."
   },
   {
     "id": "rp_006",
@@ -3804,7 +3804,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Liebe und andere Schätze",
     "searchTitle": "Liebe und andere Schätze",
     "poster": "https://www.zdf.de/assets/liebe-und-andere-schaetze-100~1920x1080?cb=1779100936024",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben."
+    "description": "[🟢 VERFÜGBAR] Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben."
   },
   {
     "id": "rp_007",
@@ -3812,7 +3812,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Der magische Bus",
     "searchTitle": "Der magische Bus",
     "poster": "https://www.zdf.de/assets/magisch-bus-100~1920x1080?cb=1572876710440",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag."
+    "description": "[🟢 VERFÜGBAR] Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag."
   },
   {
     "id": "rp_008",
@@ -3820,7 +3820,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Liebe gegen den Rest der Welt",
     "searchTitle": "Liebe gegen den Rest der Welt",
     "poster": "https://www.zdf.de/assets/liebe-gegen-den-rest-der-welt-102~1920x1080?cb=1747395872987",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte."
+    "description": "[🟢 VERFÜGBAR] Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte."
   },
   {
     "id": "rp_009",
@@ -3828,15 +3828,15 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Rundum glücklich",
     "searchTitle": "Rundum glücklich",
     "poster": "https://www.zdf.de/assets/rundum-gluecklich-100~1920x1080?cb=1738935862085",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume."
+    "description": "[🟢 VERFÜGBAR] Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume."
   },
   {
     "id": "rp_010",
     "type": "movie",
-    "name": "🟢 Rosamunde Pilcher: Die falsche Nonne",
+    "name": "🟢🟠 Rosamunde Pilcher: Die falsche Nonne",
     "searchTitle": "Die falsche Nonne",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-die-falsche-nonne-104~1920x1080?cb=1793023905964",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen."
+    "description": "[🟢🟠 VERFÜGBAR] Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen."
   },
   {
     "id": "rp_011",
@@ -3844,15 +3844,15 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Ungezügelt ins Glück",
     "searchTitle": "Ungezügelt ins Glück",
     "poster": "https://www.zdf.de/assets/ungezuegelt-ins-glueck-100~1920x1080?cb=1744907251956",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern."
+    "description": "[🟢 VERFÜGBAR] Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern."
   },
   {
     "id": "rp_012",
     "type": "movie",
-    "name": "🟢 Rosamunde Pilcher: Englischer Wein",
+    "name": "🟢🟠 Rosamunde Pilcher: Englischer Wein",
     "searchTitle": "Englischer Wein",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-englischer-wein-104~1920x1080?cb=1744711026467",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen."
+    "description": "[🟢🟠 VERFÜGBAR] Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen."
   },
   {
     "id": "rp_013",
@@ -3860,7 +3860,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Verlobt, verliebt, verwirrt",
     "searchTitle": "Verlobt, verliebt, verwirrt",
     "poster": "https://www.zdf.de/assets/verlobt-verliebt-verwirrt-100~1920x1080?cb=1745830743700",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist."
+    "description": "[🟢 VERFÜGBAR] Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist."
   },
   {
     "id": "rp_014",
@@ -3868,7 +3868,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Liebe, Diebe, Diamanten",
     "searchTitle": "Liebe, Diebe, Diamanten",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-liebe-diebe-diamanten-102~1920x1080?cb=1793024107343",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall."
+    "description": "[🟢 VERFÜGBAR] Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall."
   },
   {
     "id": "rp_015",
@@ -3876,7 +3876,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Wiedersehen in Rose Abbey",
     "searchTitle": "Wiedersehen in Rose Abbey",
     "poster": "https://www.zdf.de/assets/wiedersehen-in-rose-abbey-100~1920x1080?cb=1746798390082",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter."
+    "description": "[🟢 VERFÜGBAR] Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter."
   },
   {
     "id": "rp_016",
@@ -3884,7 +3884,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Lass es Liebe sein",
     "searchTitle": "Lass es Liebe sein",
     "poster": "https://www.zdf.de/assets/lass-es-liebe-sein-100~1920x1080?cb=1746450048706",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander."
+    "description": "[🟢 VERFÜGBAR] Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander."
   },
   {
     "id": "rp_017",
@@ -3892,7 +3892,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Das Geheimnis der Blumeninsel",
     "searchTitle": "Das Geheimnis der Blumeninsel",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-das-geheimnis-der-blumeninsel-102~1920x1080?cb=1544345904588",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen."
+    "description": "[🟢 VERFÜGBAR] Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen."
   },
   {
     "id": "rp_018",
@@ -3900,7 +3900,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Vier Luftballons und ein Todesfall",
     "searchTitle": "Vier Luftballons und ein Todesfall",
     "poster": "https://www.zdf.de/assets/vier-luftballons-und-ein-todesfall-100~1920x1080?cb=1790581314387",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil."
+    "description": "[🟢 VERFÜGBAR] Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil."
   },
   {
     "id": "rp_019",
@@ -3908,7 +3908,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Im siebten Himmel",
     "searchTitle": "Im siebten Himmel",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-im-siebten-himmel-102~1920x1080?cb=1638535290427",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall."
+    "description": "[🟢 VERFÜGBAR] Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall."
   },
   {
     "id": "rp_020",
@@ -3916,7 +3916,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Herzensläufe",
     "searchTitle": "Herzensläufe",
     "poster": "https://www.zdf.de/assets/herzenslaeufe-100~1920x1080?cb=1790922946174",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit."
+    "description": "[🟢 VERFÜGBAR] Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit."
   },
   {
     "id": "rp_021",
@@ -3924,7 +3924,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Schwiegertöchter",
     "searchTitle": "Schwiegertöchter",
     "poster": "https://www.zdf.de/assets/rosamunde-pilcher-schwiegertoechter-102~1920x1080?cb=1749544149996",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben."
+    "description": "[🟢 VERFÜGBAR] Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben."
   },
   {
     "id": "rp_022",
@@ -3932,7 +3932,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Wie verhext",
     "searchTitle": "Wie verhext",
     "poster": "https://www.zdf.de/assets/wie-verhext-102~1920x1080?cb=1751274370663",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will."
+    "description": "[🟢 VERFÜGBAR] Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will."
   },
   {
     "id": "rp_023",
@@ -3940,7 +3940,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Erdbeeren im Frühling",
     "searchTitle": "Erdbeeren im Frühling",
     "poster": "https://www.zdf.de/assets/erdbeeren-im-fruehling-106~1920x1080?cb=1696515866401",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen."
+    "description": "[🟢 VERFÜGBAR] Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen."
   },
   {
     "id": "rp_024",
@@ -3948,7 +3948,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Ein Doktor & drei Frauen",
     "searchTitle": "Ein Doktor & drei Frauen",
     "poster": "https://www.zdf.de/assets/doktor-und-drei-frauen-100~1920x1080?cb=1766147846819",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand."
+    "description": "[🟢 VERFÜGBAR] Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand."
   },
   {
     "id": "rp_025",
@@ -3956,7 +3956,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Falsches Leben, wahre Liebe",
     "searchTitle": "Falsches Leben, wahre Liebe",
     "poster": "https://www.zdf.de/assets/falschesleben-102~1920x1080?cb=1696515723171",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an."
+    "description": "[🟢 VERFÜGBAR] Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an."
   },
   {
     "id": "rp_026",
@@ -3964,7 +3964,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Die Frau auf der Klippe",
     "searchTitle": "Die Frau auf der Klippe",
     "poster": "https://www.zdf.de/assets/die-frau-auf-der-klippe-100~1920x1080?cb=1793023515200",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall."
+    "description": "[🟢 VERFÜGBAR] Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall."
   },
   {
     "id": "rp_027",
@@ -3972,7 +3972,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: In der Mitte eines Lebens",
     "searchTitle": "In der Mitte eines Lebens",
     "poster": "https://www.zdf.de/assets/in-der-mitte-des-lebens-100~1920x1080?cb=1578559755191",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken."
+    "description": "[🟢 VERFÜGBAR] Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken."
   },
   {
     "id": "rp_028",
@@ -3980,7 +3980,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Pralinen zum Frühstück",
     "searchTitle": "Pralinen zum Frühstück",
     "poster": "https://www.zdf.de/assets/pralinen-zum-fruehstueck-102~1920x1080?cb=1781704277805",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen."
+    "description": "[🟢 VERFÜGBAR] Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen."
   },
   {
     "id": "rp_029",
@@ -3988,7 +3988,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Das Geheimnis der weißen Taube",
     "searchTitle": "Das Geheimnis der weißen Taube",
     "poster": "https://www.zdf.de/assets/das-geheimnis-der-weissen-taube-100~1920x1080?cb=1746022269147",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit."
+    "description": "[🟢 VERFÜGBAR] Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit."
   },
   {
     "id": "rp_030",
@@ -4009,10 +4009,10 @@ const EPISODES = [
   {
     "id": "rp_032",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Karussell des Lebens",
+    "name": "🟠 Rosamunde Pilcher: Karussell des Lebens",
     "searchTitle": "Karussell des Lebens",
     "poster": "https://images.metahub.space/poster/medium/tt0110245/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_033",
@@ -4025,34 +4025,34 @@ const EPISODES = [
   {
     "id": "rp_034",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Das Ende eines Sommers",
+    "name": "🟠 Rosamunde Pilcher: Das Ende eines Sommers",
     "searchTitle": "Das Ende eines Sommers",
     "poster": "https://images.metahub.space/poster/medium/tt0123821/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_035",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Sommer am Meer",
+    "name": "🟠 Rosamunde Pilcher: Sommer am Meer",
     "searchTitle": "Sommer am Meer",
     "poster": "https://images.metahub.space/poster/medium/tt0114498/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_036",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Schlafender Tiger",
+    "name": "🟠 Rosamunde Pilcher: Schlafender Tiger",
     "searchTitle": "Schlafender Tiger",
     "poster": "https://images.metahub.space/poster/medium/tt0114353/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_037",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Wolken am Horizont",
+    "name": "🟠 Rosamunde Pilcher: Wolken am Horizont",
     "searchTitle": "Wolken am Horizont",
     "poster": "https://images.metahub.space/poster/medium/tt0126124/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_038",
@@ -4065,10 +4065,10 @@ const EPISODES = [
   {
     "id": "rp_039",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Lichterspiele",
+    "name": "🟠 Rosamunde Pilcher: Lichterspiele",
     "searchTitle": "Lichterspiele",
     "poster": "https://images.metahub.space/poster/medium/tt0116870/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_040",
@@ -4089,10 +4089,10 @@ const EPISODES = [
   {
     "id": "rp_042",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Das Haus an der Küste",
+    "name": "🟠 Rosamunde Pilcher: Das Haus an der Küste",
     "searchTitle": "Das Haus an der Küste",
     "poster": "https://images.metahub.space/poster/medium/tt0116498/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_043",
@@ -4113,10 +4113,10 @@ const EPISODES = [
   {
     "id": "rp_045",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Irrwege des Herzens",
+    "name": "🟠 Rosamunde Pilcher: Irrwege des Herzens",
     "searchTitle": "Irrwege des Herzens",
     "poster": "https://images.metahub.space/poster/medium/tt0119384/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_046",
@@ -4129,26 +4129,26 @@ const EPISODES = [
   {
     "id": "rp_047",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Die zweite Chance",
+    "name": "🟠 Rosamunde Pilcher: Die zweite Chance",
     "searchTitle": "Die zweite Chance",
     "poster": "https://images.metahub.space/poster/medium/tt0128860/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_048",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Zwei Schwestern",
+    "name": "🟠 Rosamunde Pilcher: Zwei Schwestern",
     "searchTitle": "Zwei Schwestern",
     "poster": "https://images.metahub.space/poster/medium/tt0135071/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_049",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Der Preis der Liebe",
+    "name": "🟠 Rosamunde Pilcher: Der Preis der Liebe",
     "searchTitle": "Der Preis der Liebe",
     "poster": "https://images.metahub.space/poster/medium/tt0146041/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_050",
@@ -4169,66 +4169,66 @@ const EPISODES = [
   {
     "id": "rp_052",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Rückkehr ins Paradies",
+    "name": "🟠 Rosamunde Pilcher: Rückkehr ins Paradies",
     "searchTitle": "Rückkehr ins Paradies",
     "poster": "https://images.metahub.space/poster/medium/tt0170520/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_053",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Dornen im Tal der Blumen",
+    "name": "🟠 Rosamunde Pilcher: Dornen im Tal der Blumen",
     "searchTitle": "Dornen im Tal der Blumen",
     "poster": "https://images.metahub.space/poster/medium/tt0177180/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_054",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Melodie der Herzen",
+    "name": "🟠 Rosamunde Pilcher: Melodie der Herzen",
     "searchTitle": "Melodie der Herzen",
     "poster": "https://images.metahub.space/poster/medium/tt0181794/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_055",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Magie der Liebe",
+    "name": "🟠 Rosamunde Pilcher: Magie der Liebe",
     "searchTitle": "Magie der Liebe",
     "poster": "https://images.metahub.space/poster/medium/tt0184868/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_056",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Rosen im Sturm",
+    "name": "🟠 Rosamunde Pilcher: Rosen im Sturm",
     "searchTitle": "Rosen im Sturm",
     "poster": "https://images.metahub.space/poster/medium/tt0188183/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_057",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Das große Erbe: Teil 1",
+    "name": "🟠 Rosamunde Pilcher: Das große Erbe: Teil 1",
     "searchTitle": "Das große Erbe: Teil 1",
     "poster": "https://images.metahub.space/poster/medium/tt15740730/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_058",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Das große Erbe: Teil 2",
+    "name": "🟠 Rosamunde Pilcher: Das große Erbe: Teil 2",
     "searchTitle": "Das große Erbe: Teil 2",
     "poster": "https://images.metahub.space/poster/medium/tt15740738/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_059",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Klippen der Liebe",
+    "name": "🟠 Rosamunde Pilcher: Klippen der Liebe",
     "searchTitle": "Klippen der Liebe",
     "poster": "https://images.metahub.space/poster/medium/tt0217605/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_060",
@@ -4241,10 +4241,10 @@ const EPISODES = [
   {
     "id": "rp_061",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Blüte des Lebens",
+    "name": "🟠 Rosamunde Pilcher: Blüte des Lebens",
     "searchTitle": "Blüte des Lebens",
     "poster": "https://images.metahub.space/poster/medium/tt0226390/img",
-    "description": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_062",
@@ -4281,10 +4281,10 @@ const EPISODES = [
   {
     "id": "rp_066",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Im Licht des Feuers",
+    "name": "🟠 Rosamunde Pilcher: Im Licht des Feuers",
     "searchTitle": "Im Licht des Feuers",
     "poster": "https://images.metahub.space/poster/medium/tt0271760/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_067",
@@ -4321,10 +4321,10 @@ const EPISODES = [
   {
     "id": "rp_071",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Blumen im Regen",
+    "name": "🟠 Rosamunde Pilcher: Blumen im Regen",
     "searchTitle": "Blumen im Regen",
     "poster": "https://images.metahub.space/poster/medium/tt0304642/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_072",
@@ -4353,10 +4353,10 @@ const EPISODES = [
   {
     "id": "rp_075",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Bis ans Ende der Welt",
+    "name": "🟠 Rosamunde Pilcher: Bis ans Ende der Welt",
     "searchTitle": "Bis ans Ende der Welt",
     "poster": "https://images.metahub.space/poster/medium/tt0345873/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_076",
@@ -4449,10 +4449,10 @@ const EPISODES = [
   {
     "id": "rp_087",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Dem Himmel so nah",
+    "name": "🟠 Rosamunde Pilcher: Dem Himmel so nah",
     "searchTitle": "Dem Himmel so nah",
     "poster": "https://images.metahub.space/poster/medium/tt0450116/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_088",
@@ -4481,10 +4481,10 @@ const EPISODES = [
   {
     "id": "rp_091",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Über den Wolken",
+    "name": "🟠 Rosamunde Pilcher: Über den Wolken",
     "searchTitle": "Über den Wolken",
     "poster": "https://images.metahub.space/poster/medium/tt0491128/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_092",
@@ -4537,10 +4537,10 @@ const EPISODES = [
   {
     "id": "rp_098",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Und plötzlich war es Liebe",
+    "name": "🟠 Rosamunde Pilcher: Und plötzlich war es Liebe",
     "searchTitle": "Und plötzlich war es Liebe",
     "poster": "https://images.metahub.space/poster/medium/tt0903964/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_099",
@@ -4593,18 +4593,18 @@ const EPISODES = [
   {
     "id": "rp_105",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Aus Liebe und Leidenschaft",
+    "name": "🟠 Rosamunde Pilcher: Aus Liebe und Leidenschaft",
     "searchTitle": "Aus Liebe und Leidenschaft",
     "poster": "https://images.metahub.space/poster/medium/tt1140926/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_106",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Wind über der See",
+    "name": "🟠 Rosamunde Pilcher: Wind über der See",
     "searchTitle": "Wind über der See",
     "poster": "https://images.metahub.space/poster/medium/tt1150986/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_107",
@@ -4625,10 +4625,10 @@ const EPISODES = [
   {
     "id": "rp_109",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Herzen im Wind",
+    "name": "🟠 Rosamunde Pilcher: Herzen im Wind",
     "searchTitle": "Herzen im Wind",
     "poster": "https://images.metahub.space/poster/medium/tt1178399/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_110",
@@ -4641,10 +4641,10 @@ const EPISODES = [
   {
     "id": "rp_111",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Herzenssehnsucht",
+    "name": "🟠 Rosamunde Pilcher: Herzenssehnsucht",
     "searchTitle": "Herzenssehnsucht",
     "poster": "https://images.metahub.space/poster/medium/tt1178401/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_112",
@@ -4689,10 +4689,10 @@ const EPISODES = [
   {
     "id": "rp_117",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Wenn das Herz zerbricht",
+    "name": "🟠 Rosamunde Pilcher: Wenn das Herz zerbricht",
     "searchTitle": "Wenn das Herz zerbricht",
     "poster": "https://images.metahub.space/poster/medium/tt1670117/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_118",
@@ -4713,10 +4713,10 @@ const EPISODES = [
   {
     "id": "rp_120",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Herzensfragen",
+    "name": "🟠 Rosamunde Pilcher: Herzensfragen",
     "searchTitle": "Herzensfragen",
     "poster": "https://images.metahub.space/poster/medium/tt1794473/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_121",
@@ -4729,10 +4729,10 @@ const EPISODES = [
   {
     "id": "rp_122",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Der gestohlene Sommer",
+    "name": "🟠 Rosamunde Pilcher: Der gestohlene Sommer",
     "searchTitle": "Der gestohlene Sommer",
     "poster": "https://images.metahub.space/poster/medium/tt2050247/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_123",
@@ -4761,10 +4761,10 @@ const EPISODES = [
   {
     "id": "rp_126",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Eine Frage der Ehre",
+    "name": "🟠 Rosamunde Pilcher: Eine Frage der Ehre",
     "searchTitle": "Eine Frage der Ehre",
     "poster": "https://images.metahub.space/poster/medium/tt2592426/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_127",
@@ -4780,7 +4780,7 @@ const EPISODES = [
     "name": "🟢 Rosamunde Pilcher: Die versprochene Braut",
     "searchTitle": "Die versprochene Braut",
     "poster": "https://images.metahub.space/poster/medium/tt3128154/img",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟢 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_129",
@@ -4793,10 +4793,10 @@ const EPISODES = [
   {
     "id": "rp_130",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Zu hoch geflogen",
+    "name": "🟠 Rosamunde Pilcher: Zu hoch geflogen",
     "searchTitle": "Zu hoch geflogen",
     "poster": "https://images.metahub.space/poster/medium/tt3443090/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_131",
@@ -4841,10 +4841,10 @@ const EPISODES = [
   {
     "id": "rp_136",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Ghostwriter",
+    "name": "🟠 Rosamunde Pilcher: Ghostwriter",
     "searchTitle": "Ghostwriter",
     "poster": "https://images.metahub.space/poster/medium/tt5921002/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_137",
@@ -4865,10 +4865,10 @@ const EPISODES = [
   {
     "id": "rp_139",
     "type": "movie",
-    "name": "Rosamunde Pilcher: Vollkommen unerwartet",
+    "name": "🟠 Rosamunde Pilcher: Vollkommen unerwartet",
     "searchTitle": "Vollkommen unerwartet",
     "poster": "https://images.metahub.space/poster/medium/tt5376696/img",
-    "description": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_140",
@@ -4881,10 +4881,10 @@ const EPISODES = [
   {
     "id": "rp_141",
     "type": "movie",
-    "name": "🟢 Rosamunde Pilcher: Lizenz zum Seitensprung",
+    "name": "🟢🟠 Rosamunde Pilcher: Lizenz zum Seitensprung",
     "searchTitle": "Lizenz zum Seitensprung",
     "poster": "https://images.metahub.space/poster/medium/tt5295330/img",
-    "description": "🟢 [100% FUNKTIONIERT - ZDFmediathek HD] Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
+    "description": "[🟢🟠 VERFÜGBAR] Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands."
   },
   {
     "id": "rp_142",
@@ -5118,17 +5118,17 @@ const EPISODES = [
 const builder = new addonBuilder(manifest);
 
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
-  // 1. Series Catalog (Opens the full series with 🟢 on working episodes, real dates & covers)
+  // 1. Series Catalog (Visual indicators: 🟢 ZDF HD, 🟠 YouTube Full Movie)
   if (type === 'series' && id === 'rp_zdf_series_catalog') {
     return {
       metas: [
         {
           id: 'rp_series_complete',
           type: 'series',
-          name: '🟢 Rosamunde Pilcher (Komplette Serie 1993-2026)',
+          name: '🟢🟠 Rosamunde Pilcher (Komplette Serie 1993-2026)',
           poster: 'https://images.metahub.space/poster/medium/tt0907694/img',
           background: 'https://images.metahub.space/background/medium/tt0907694/img',
-          description: 'Alle 169 Verfilmungen der Herzkino-Reihe. 🟢 Episoden mit grünem Kreis sind aktuell in der ZDFmediathek verfügbar und funktionieren zu 100% in HD!',
+          description: 'Alle 169 Verfilmungen der Herzkino-Reihe. 🟢 = ZDFmediathek 1080p (100% funktioniert) • 🟠 = YouTube voller Spielfilm.',
           releaseInfo: '1993-',
           genres: ['Drama', 'Romance']
         }
@@ -5168,7 +5168,7 @@ builder.defineMetaHandler(async ({ type, id }) => {
         genres: ['Drama', 'Romance'],
         poster: 'https://images.metahub.space/poster/medium/tt0907694/img',
         background: 'https://images.metahub.space/background/medium/tt0907694/img',
-        description: 'Die beliebten Verfilmungen der Herzkino-Reihe des ZDF nach den Erzählungen und Romanen von Rosamunde Pilcher. 🟢 Episoden mit grünem Kreis funktionieren zu 100% in offizieller 1080p HD Qualität aus der ZDFmediathek!',
+        description: 'Herzkino-Reihe nach Rosamunde Pilcher. 🟢 = ZDFmediathek 1080p (100% funktioniert) • 🟠 = YouTube voller Spielfilm.',
         releaseInfo: '1993-',
         videos: SERIES_VIDEOS
       }
@@ -5220,7 +5220,7 @@ function normalizeGerman(str) {
 
 function cleanCoreTitle(raw) {
   return (raw || '')
-    .replace(/^[🟢\s]+/u, '')
+    .replace(/^[🟢🟠\s]+/u, '')
     .replace(/^Rosamunde Pilcher:\s*/i, '')
     .replace(/\s*-\s*Nach der Kurzgeschichte.*$/i, '')
     .replace(/\s*-\s*Aus der Herzkino.*$/i, '')
@@ -5231,16 +5231,15 @@ function cleanCoreTitle(raw) {
 
 function isStrictTitleMatch(searchTitle, ytTitle) {
   const normYT = normalizeGerman(ytTitle);
+  if (!normYT.includes('pilcher') && !normYT.includes('rosamunde')) return false;
+
   const normSearch = normalizeGerman(searchTitle);
   const keywords = normSearch.split(' ').filter(w => w.length >= 2 && !STOPWORDS.has(w));
   if (keywords.length === 0) return false;
 
   return keywords.every(kw => {
-    if (kw.length <= 3) {
-      const reg = new RegExp('(^|\\s)' + kw + '(\\s|$)');
-      return reg.test(normYT);
-    }
-    return normYT.includes(kw);
+    const reg = new RegExp('(^|\\s)' + kw + '(\\s|$)', 'i');
+    return reg.test(normYT);
   });
 }
 
@@ -5372,7 +5371,7 @@ builder.defineStreamHandler(async ({ type, id }) => {
       searchYouTubeFullMovies(coreTitle)
     ]);
 
-    // 1. Official Broadcaster Streams (🟢 100% Guaranteed Quality)
+    // 1. Official Broadcaster Streams (🟢 100% Guaranteed 1080p Quality)
     if (mediathekList.length > 0) {
       const primary = mediathekList.find(m => !/Audiodeskription/i.test(m.title)) || mediathekList[0];
       const streamUrl = primary.url_video_hd || primary.url_video;
@@ -5381,19 +5380,19 @@ builder.defineStreamHandler(async ({ type, id }) => {
         const durationMin = Math.round((primary.duration || 0) / 60);
         streams.push({
           name: '🟢 [' + channel + ' HD] 1080p',
-          title: '🟢 ' + primary.title + '\n' + channel + 'mediathek Stream (' + durationMin + ' min) • 100% Funktioniert',
+          title: '🟢 ' + primary.title + '\n' + channel + 'mediathek (' + durationMin + ' min) • 100% Funktioniert',
           url: streamUrl,
           behaviorHints: { notWebReady: false }
         });
       }
     }
 
-    // 2. Verified YouTube Full Films / Parts (>= 40 min)
+    // 2. Verified YouTube Full Films / Parts (🟠 >= 40 min)
     if (ytList.length > 0) {
       for (const yt of ytList) {
         streams.push({
-          name: 'YouTube HD [' + yt.lengthText + ']',
-          title: yt.title + '\nSpielfilm auf YouTube (' + yt.lengthText + ')',
+          name: '🟠 [YouTube HD] ' + yt.lengthText,
+          title: '🟠 ' + yt.title + '\nSpielfilm auf YouTube (' + yt.lengthText + ')',
           ytId: yt.videoId
         });
       }
@@ -5463,10 +5462,10 @@ module.exports = (req, res) => {
       Manifest URL: <br><br><code>${manifestUrl}</code>
     </div>
     <div class="info-box">
-      <h3>🟢 Complete Metadata & Visual Indicators</h3>
-      • 🟢 in episode names = Currently live on ZDFmediathek, 100% guaranteed to play in 1080p.<br>
-      • Real broadcast air dates replace "TBA".<br>
-      • Authentic episode thumbnail covers for every episode.
+      <h3>🟢 & 🟠 Visual Indicators</h3>
+      • 🟢 = ZDFmediathek 1080p stream available (100% works)<br>
+      • 🟠 = YouTube verified full movie stream available (>= 40 min)<br>
+      • 🟢🟠 = Available on both ZDF and YouTube!
     </div>
   </div>
 </body>
