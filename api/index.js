@@ -2,16 +2,16 @@ const { addonBuilder, getRouter: sdkGetRouter } = require('stremio-addon-sdk');
 const axios = require('axios');
 
 // ============================================================================
-// 1. MANIFEST CONFIGURATION (v1.5.0)
+// 1. MANIFEST CONFIGURATION (v1.6.0)
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '1.5.0',
-  name: 'Rosamunde Pilcher Collection (ZDF & YouTube HD)',
-  description: 'Streams all 169 Rosamunde Pilcher films directly from German public broadcasters (ZDF, 3sat, ORF) and verified full-length YouTube films (>45 min)',
+  version: '1.6.0',
+  name: 'Rosamunde Pilcher Collection (ZDF, YouTube & Series)',
+  description: 'Streams all 169 Rosamunde Pilcher films directly inside the official Stremio series (tt0907694) and ZDF Mediathek catalog',
   resources: ['catalog', 'meta', 'stream'],
-  types: ['movie'],
-  idPrefixes: ['rp_'],
+  types: ['series', 'movie'],
+  idPrefixes: ['tt0907694', 'tt', 'rp_'],
   catalogs: [
     {
       type: 'movie',
@@ -25,8 +25,3392 @@ const manifest = {
 };
 
 // ============================================================================
-// 2. COMPLETE EPISODE DATABASE (169 FILMS)
+// 2. SERIES EPISODES MAP & CATALOG DATABASE
 // ============================================================================
+const SERIES_MAP = {
+  "tt0907694:1:1": {
+    "id": "tt0907694:1:1",
+    "number": 1,
+    "season": 1,
+    "name": "Stürmische Begegnung",
+    "imdb_id": "tt0108240",
+    "overview": "Rosamunde Pilcher Liebesfilm (1993). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0108240/img"
+  },
+  "tt0907694:1:2": {
+    "id": "tt0907694:1:2",
+    "number": 2,
+    "season": 1,
+    "name": "Wilder Thymian",
+    "imdb_id": "tt0111721",
+    "overview": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0111721/img"
+  },
+  "tt0907694:1:3": {
+    "id": "tt0907694:1:3",
+    "number": 3,
+    "season": 1,
+    "name": "Karussell des Lebens",
+    "imdb_id": "tt0110245",
+    "overview": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0110245/img"
+  },
+  "tt0907694:1:4": {
+    "id": "tt0907694:1:4",
+    "number": 4,
+    "season": 1,
+    "name": "Wechselspiel der Liebe",
+    "imdb_id": "tt0114903",
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0114903/img"
+  },
+  "tt0907694:1:5": {
+    "id": "tt0907694:1:5",
+    "number": 5,
+    "season": 1,
+    "name": "Das Ende eines Sommers",
+    "imdb_id": "tt0123821",
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0123821/img"
+  },
+  "tt0907694:1:6": {
+    "id": "tt0907694:1:6",
+    "number": 6,
+    "season": 1,
+    "name": "Sommer am Meer",
+    "imdb_id": "tt0114498",
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0114498/img"
+  },
+  "tt0907694:1:7": {
+    "id": "tt0907694:1:7",
+    "number": 7,
+    "season": 1,
+    "name": "Schlafender Tiger",
+    "imdb_id": "tt0114353",
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0114353/img"
+  },
+  "tt0907694:1:8": {
+    "id": "tt0907694:1:8",
+    "number": 8,
+    "season": 1,
+    "name": "Wolken am Horizont",
+    "imdb_id": "tt0126124",
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0126124/img"
+  },
+  "tt0907694:1:9": {
+    "id": "tt0907694:1:9",
+    "number": 9,
+    "season": 1,
+    "name": "Schneesturm im Frühling",
+    "imdb_id": "tt0117564",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0117564/img"
+  },
+  "tt0907694:1:10": {
+    "id": "tt0907694:1:10",
+    "number": 10,
+    "season": 1,
+    "name": "Lichterspiele",
+    "imdb_id": "tt0116870",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0116870/img"
+  },
+  "tt0907694:1:11": {
+    "id": "tt0907694:1:11",
+    "number": 11,
+    "season": 1,
+    "name": "September: Teil 1",
+    "imdb_id": "tt15729598",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15729598/img"
+  },
+  "tt0907694:1:12": {
+    "id": "tt0907694:1:12",
+    "number": 12,
+    "season": 1,
+    "name": "September: Teil 2",
+    "imdb_id": "tt15741176",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15741176/img"
+  },
+  "tt0907694:1:13": {
+    "id": "tt0907694:1:13",
+    "number": 13,
+    "season": 1,
+    "name": "Das Haus an der Küste",
+    "imdb_id": "tt0116498",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0116498/img"
+  },
+  "tt0907694:1:14": {
+    "id": "tt0907694:1:14",
+    "number": 14,
+    "season": 1,
+    "name": "Eine besondere Liebe",
+    "imdb_id": "tt0115659",
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0115659/img"
+  },
+  "tt0907694:1:15": {
+    "id": "tt0907694:1:15",
+    "number": 15,
+    "season": 1,
+    "name": "Wind der Hoffnung",
+    "imdb_id": "tt0120517",
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0120517/img"
+  },
+  "tt0907694:1:16": {
+    "id": "tt0907694:1:16",
+    "number": 16,
+    "season": 1,
+    "name": "Irrwege des Herzens",
+    "imdb_id": "tt0119384",
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0119384/img"
+  },
+  "tt0907694:1:17": {
+    "id": "tt0907694:1:17",
+    "number": 17,
+    "season": 1,
+    "name": "Stunden der Entscheidung",
+    "imdb_id": "tt0120234",
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0120234/img"
+  },
+  "tt0907694:1:18": {
+    "id": "tt0907694:1:18",
+    "number": 18,
+    "season": 1,
+    "name": "Die zweite Chance",
+    "imdb_id": "tt0128860",
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0128860/img"
+  },
+  "tt0907694:1:19": {
+    "id": "tt0907694:1:19",
+    "number": 19,
+    "season": 1,
+    "name": "Zwei Schwestern",
+    "imdb_id": "tt0135071",
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0135071/img"
+  },
+  "tt0907694:1:20": {
+    "id": "tt0907694:1:20",
+    "number": 20,
+    "season": 1,
+    "name": "Der Preis der Liebe",
+    "imdb_id": "tt0146041",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0146041/img"
+  },
+  "tt0907694:1:21": {
+    "id": "tt0907694:1:21",
+    "number": 21,
+    "season": 1,
+    "name": "Heimkehr: Teil 1",
+    "imdb_id": "tt15729564",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15729564/img"
+  },
+  "tt0907694:1:22": {
+    "id": "tt0907694:1:22",
+    "number": 22,
+    "season": 1,
+    "name": "Heimkehr: Teil 2",
+    "imdb_id": "tt15729560",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15729560/img"
+  },
+  "tt0907694:1:23": {
+    "id": "tt0907694:1:23",
+    "number": 23,
+    "season": 1,
+    "name": "Rückkehr ins Paradies",
+    "imdb_id": "tt0170520",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0170520/img"
+  },
+  "tt0907694:1:24": {
+    "id": "tt0907694:1:24",
+    "number": 24,
+    "season": 1,
+    "name": "Dornen im Tal der Blumen",
+    "imdb_id": "tt0177180",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0177180/img"
+  },
+  "tt0907694:1:25": {
+    "id": "tt0907694:1:25",
+    "number": 25,
+    "season": 1,
+    "name": "Melodie der Herzen",
+    "imdb_id": "tt0181794",
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0181794/img"
+  },
+  "tt0907694:1:26": {
+    "id": "tt0907694:1:26",
+    "number": 26,
+    "season": 1,
+    "name": "Magie der Liebe",
+    "imdb_id": "tt0184868",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0184868/img"
+  },
+  "tt0907694:1:27": {
+    "id": "tt0907694:1:27",
+    "number": 27,
+    "season": 1,
+    "name": "Rosen im Sturm",
+    "imdb_id": "tt0188183",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0188183/img"
+  },
+  "tt0907694:1:28": {
+    "id": "tt0907694:1:28",
+    "number": 28,
+    "season": 1,
+    "name": "Das große Erbe: Teil 1",
+    "imdb_id": "tt15740730",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15740730/img"
+  },
+  "tt0907694:1:29": {
+    "id": "tt0907694:1:29",
+    "number": 29,
+    "season": 1,
+    "name": "Das große Erbe: Teil 2",
+    "imdb_id": "tt15740738",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15740738/img"
+  },
+  "tt0907694:1:30": {
+    "id": "tt0907694:1:30",
+    "number": 30,
+    "season": 1,
+    "name": "Klippen der Liebe",
+    "imdb_id": "tt0217605",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0217605/img"
+  },
+  "tt0907694:1:31": {
+    "id": "tt0907694:1:31",
+    "number": 31,
+    "season": 1,
+    "name": "Möwen im Wind",
+    "imdb_id": "tt0222330",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0222330/img"
+  },
+  "tt0907694:1:32": {
+    "id": "tt0907694:1:32",
+    "number": 32,
+    "season": 1,
+    "name": "Blüte des Lebens",
+    "imdb_id": "tt0226390",
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0226390/img"
+  },
+  "tt0907694:1:33": {
+    "id": "tt0907694:1:33",
+    "number": 33,
+    "season": 1,
+    "name": "Der lange Weg zum Glück",
+    "imdb_id": "tt0230712",
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0230712/img"
+  },
+  "tt0907694:1:34": {
+    "id": "tt0907694:1:34",
+    "number": 34,
+    "season": 1,
+    "name": "Zeit der Erkenntnis",
+    "imdb_id": "tt0244176",
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0244176/img"
+  },
+  "tt0907694:1:35": {
+    "id": "tt0907694:1:35",
+    "number": 35,
+    "season": 1,
+    "name": "Zerrissene Herzen",
+    "imdb_id": "tt0262737",
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0262737/img"
+  },
+  "tt0907694:1:36": {
+    "id": "tt0907694:1:36",
+    "number": 36,
+    "season": 1,
+    "name": "Ruf der Vergangenheit",
+    "imdb_id": "tt0266913",
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0266913/img"
+  },
+  "tt0907694:1:37": {
+    "id": "tt0907694:1:37",
+    "number": 37,
+    "season": 1,
+    "name": "Im Licht des Feuers",
+    "imdb_id": "tt0271760",
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0271760/img"
+  },
+  "tt0907694:1:38": {
+    "id": "tt0907694:1:38",
+    "number": 38,
+    "season": 1,
+    "name": "Die Rose von Kerrymore",
+    "imdb_id": "tt0272817",
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0272817/img"
+  },
+  "tt0907694:1:39": {
+    "id": "tt0907694:1:39",
+    "number": 39,
+    "season": 1,
+    "name": "Küste der Träume",
+    "imdb_id": "tt0275637",
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0275637/img"
+  },
+  "tt0907694:1:40": {
+    "id": "tt0907694:1:40",
+    "number": 40,
+    "season": 1,
+    "name": "Kinder des Glücks",
+    "imdb_id": "tt0300428",
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0300428/img"
+  },
+  "tt0907694:1:41": {
+    "id": "tt0907694:1:41",
+    "number": 41,
+    "season": 1,
+    "name": "Wind über dem Fluss",
+    "imdb_id": "tt0301782",
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0301782/img"
+  },
+  "tt0907694:1:42": {
+    "id": "tt0907694:1:42",
+    "number": 42,
+    "season": 1,
+    "name": "Blumen im Regen",
+    "imdb_id": "tt0304642",
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0304642/img"
+  },
+  "tt0907694:1:43": {
+    "id": "tt0907694:1:43",
+    "number": 43,
+    "season": 1,
+    "name": "Wenn nur noch Liebe zählt",
+    "imdb_id": "tt0310081",
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0310081/img"
+  },
+  "tt0907694:1:44": {
+    "id": "tt0907694:1:44",
+    "number": 44,
+    "season": 1,
+    "name": "Morgen träumen wir gemeinsam",
+    "imdb_id": "tt0316507",
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0316507/img"
+  },
+  "tt0907694:1:45": {
+    "id": "tt0907694:1:45",
+    "number": 45,
+    "season": 1,
+    "name": "Mit den Augen der Liebe",
+    "imdb_id": "tt0337119",
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0337119/img"
+  },
+  "tt0907694:1:46": {
+    "id": "tt0907694:1:46",
+    "number": 46,
+    "season": 1,
+    "name": "Bis ans Ende der Welt",
+    "imdb_id": "tt0345873",
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0345873/img"
+  },
+  "tt0907694:1:47": {
+    "id": "tt0907694:1:47",
+    "number": 47,
+    "season": 1,
+    "name": "Sternschnuppen im August",
+    "imdb_id": "tt0348739",
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0348739/img"
+  },
+  "tt0907694:1:48": {
+    "id": "tt0907694:1:48",
+    "number": 48,
+    "season": 1,
+    "name": "Paradies der Träume",
+    "imdb_id": "tt0353957",
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0353957/img"
+  },
+  "tt0907694:1:49": {
+    "id": "tt0907694:1:49",
+    "number": 49,
+    "season": 1,
+    "name": "Flamme der Liebe",
+    "imdb_id": "tt0357109",
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0357109/img"
+  },
+  "tt0907694:1:50": {
+    "id": "tt0907694:1:50",
+    "number": 50,
+    "season": 1,
+    "name": "Gewissheit des Herzens",
+    "imdb_id": "tt0386755",
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0386755/img"
+  },
+  "tt0907694:1:51": {
+    "id": "tt0907694:1:51",
+    "number": 51,
+    "season": 1,
+    "name": "Wintersonne (1+2)",
+    "imdb_id": "tt15727968",
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15727968/img"
+  },
+  "tt0907694:1:52": {
+    "id": "tt0907694:1:52",
+    "number": 52,
+    "season": 1,
+    "name": "Federn im Wind",
+    "imdb_id": "tt0396843",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0396843/img"
+  },
+  "tt0907694:1:53": {
+    "id": "tt0907694:1:53",
+    "number": 53,
+    "season": 1,
+    "name": "Wege der Liebe",
+    "imdb_id": "tt0393657",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0393657/img"
+  },
+  "tt0907694:1:54": {
+    "id": "tt0907694:1:54",
+    "number": 54,
+    "season": 1,
+    "name": "Solange es dich gibt",
+    "imdb_id": "tt0433629",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0433629/img"
+  },
+  "tt0907694:1:55": {
+    "id": "tt0907694:1:55",
+    "number": 55,
+    "season": 1,
+    "name": "Liebe im Spiel",
+    "imdb_id": "tt0410534",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0410534/img"
+  },
+  "tt0907694:1:56": {
+    "id": "tt0907694:1:56",
+    "number": 56,
+    "season": 1,
+    "name": "Traum eines Sommers",
+    "imdb_id": "tt0450119",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0450119/img"
+  },
+  "tt0907694:1:57": {
+    "id": "tt0907694:1:57",
+    "number": 57,
+    "season": 1,
+    "name": "Tiefe der Gefühle",
+    "imdb_id": "tt0432346",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0432346/img"
+  },
+  "tt0907694:1:58": {
+    "id": "tt0907694:1:58",
+    "number": 58,
+    "season": 1,
+    "name": "Dem Himmel so nah",
+    "imdb_id": "tt0450116",
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0450116/img"
+  },
+  "tt0907694:1:59": {
+    "id": "tt0907694:1:59",
+    "number": 59,
+    "season": 1,
+    "name": "Vermächtnis der Liebe",
+    "imdb_id": "tt0450120",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0450120/img"
+  },
+  "tt0907694:1:60": {
+    "id": "tt0907694:1:60",
+    "number": 60,
+    "season": 1,
+    "name": "Königin der Nacht",
+    "imdb_id": "tt0450117",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0450117/img"
+  },
+  "tt0907694:1:61": {
+    "id": "tt0907694:1:61",
+    "number": 61,
+    "season": 1,
+    "name": "Segel der Liebe",
+    "imdb_id": "tt0450118",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0450118/img"
+  },
+  "tt0907694:1:62": {
+    "id": "tt0907694:1:62",
+    "number": 62,
+    "season": 1,
+    "name": "Über den Wolken",
+    "imdb_id": "tt0491128",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0491128/img"
+  },
+  "tt0907694:1:63": {
+    "id": "tt0907694:1:63",
+    "number": 63,
+    "season": 1,
+    "name": "Zauber der Liebe (1+2)",
+    "imdb_id": "tt15727726",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15727726/img"
+  },
+  "tt0907694:1:64": {
+    "id": "tt0907694:1:64",
+    "number": 64,
+    "season": 1,
+    "name": "Der Himmel über Cornwall",
+    "imdb_id": "tt0777270",
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0777270/img"
+  },
+  "tt0907694:1:65": {
+    "id": "tt0907694:1:65",
+    "number": 65,
+    "season": 1,
+    "name": "Land der Sehnsucht",
+    "imdb_id": "tt0497438",
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0497438/img"
+  },
+  "tt0907694:1:66": {
+    "id": "tt0907694:1:66",
+    "number": 66,
+    "season": 1,
+    "name": "Sommer des Erwachens",
+    "imdb_id": "tt0499557",
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0499557/img"
+  },
+  "tt0907694:1:67": {
+    "id": "tt0907694:1:67",
+    "number": 67,
+    "season": 1,
+    "name": "Wo die Liebe begann",
+    "imdb_id": "tt0857260",
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0857260/img"
+  },
+  "tt0907694:1:68": {
+    "id": "tt0907694:1:68",
+    "number": 68,
+    "season": 1,
+    "name": "Die Liebe ihres Lebens",
+    "imdb_id": "tt0872156",
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0872156/img"
+  },
+  "tt0907694:1:69": {
+    "id": "tt0907694:1:69",
+    "number": 69,
+    "season": 1,
+    "name": "Und plötzlich war es Liebe",
+    "imdb_id": "tt0903964",
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0903964/img"
+  },
+  "tt0907694:1:71": {
+    "id": "tt0907694:1:71",
+    "number": 71,
+    "season": 1,
+    "name": "Wiedersehen am Fluss",
+    "imdb_id": "tt0943113",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0943113/img"
+  },
+  "tt0907694:1:72": {
+    "id": "tt0907694:1:72",
+    "number": 72,
+    "season": 1,
+    "name": "Sommer der Liebe",
+    "imdb_id": "tt0988802",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0988802/img"
+  },
+  "tt0907694:1:73": {
+    "id": "tt0907694:1:73",
+    "number": 73,
+    "season": 1,
+    "name": "Flügel der Hoffnung",
+    "imdb_id": "tt0988801",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt0988801/img"
+  },
+  "tt0907694:1:74": {
+    "id": "tt0907694:1:74",
+    "number": 74,
+    "season": 1,
+    "name": "Der Mann meiner Träume",
+    "imdb_id": "tt1096981",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1096981/img"
+  },
+  "tt0907694:1:75": {
+    "id": "tt0907694:1:75",
+    "number": 75,
+    "season": 1,
+    "name": "Sieg der Liebe",
+    "imdb_id": "tt1106607",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1106607/img"
+  },
+  "tt0907694:1:76": {
+    "id": "tt0907694:1:76",
+    "number": 76,
+    "season": 1,
+    "name": "Nebel über Schloss Kilrush",
+    "imdb_id": "tt1125243",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1125243/img"
+  },
+  "tt0907694:1:77": {
+    "id": "tt0907694:1:77",
+    "number": 77,
+    "season": 1,
+    "name": "Aus Liebe und Leidenschaft",
+    "imdb_id": "tt1140926",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1140926/img"
+  },
+  "tt0907694:1:78": {
+    "id": "tt0907694:1:78",
+    "number": 78,
+    "season": 1,
+    "name": "Wind über der See",
+    "imdb_id": "tt1150986",
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1150986/img"
+  },
+  "tt0907694:1:79": {
+    "id": "tt0907694:1:79",
+    "number": 79,
+    "season": 1,
+    "name": "Pfeile der Liebe",
+    "imdb_id": "tt1177749",
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1177749/img"
+  },
+  "tt0907694:1:80": {
+    "id": "tt0907694:1:80",
+    "number": 80,
+    "season": 1,
+    "name": "Melodie der Liebe",
+    "imdb_id": "tt1178398",
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178398/img"
+  },
+  "tt0907694:1:81": {
+    "id": "tt0907694:1:81",
+    "number": 81,
+    "season": 1,
+    "name": "Herzen im Wind",
+    "imdb_id": "tt1178399",
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178399/img"
+  },
+  "tt0907694:1:84": {
+    "id": "tt0907694:1:84",
+    "number": 84,
+    "season": 1,
+    "name": "Gezeiten der Liebe",
+    "imdb_id": "tt1178400",
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178400/img"
+  },
+  "tt0907694:1:85": {
+    "id": "tt0907694:1:85",
+    "number": 85,
+    "season": 1,
+    "name": "Herzenssehnsucht",
+    "imdb_id": "tt1178401",
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178401/img"
+  },
+  "tt0907694:1:86": {
+    "id": "tt0907694:1:86",
+    "number": 86,
+    "season": 1,
+    "name": "Eine Liebe im Herbst",
+    "imdb_id": "tt1178402",
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178402/img"
+  },
+  "tt0907694:1:87": {
+    "id": "tt0907694:1:87",
+    "number": 87,
+    "season": 1,
+    "name": "Entscheidung des Herzens",
+    "imdb_id": "tt1178403",
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1178403/img"
+  },
+  "tt0907694:1:88": {
+    "id": "tt0907694:1:88",
+    "number": 88,
+    "season": 1,
+    "name": "Liebe gegen den Rest der Welt",
+    "imdb_id": "tt1178404",
+    "overview": "Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte.",
+    "poster": "https://www.zdf.de/assets/liebe-gegen-den-rest-der-welt-102~1920x1080?cb=1747395872987"
+  },
+  "tt0907694:1:89": {
+    "id": "tt0907694:1:89",
+    "number": 89,
+    "season": 1,
+    "name": "Wiedersehen in Rose Abbey",
+    "imdb_id": "tt1178405",
+    "overview": "Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter.",
+    "poster": "https://www.zdf.de/assets/wiedersehen-in-rose-abbey-100~1920x1080?cb=1746798390082"
+  },
+  "tt0907694:1:90": {
+    "id": "tt0907694:1:90",
+    "number": 90,
+    "season": 1,
+    "name": "Lass es Liebe sein",
+    "imdb_id": "tt1178406",
+    "overview": "Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander.",
+    "poster": "https://www.zdf.de/assets/lass-es-liebe-sein-100~1920x1080?cb=1746450048706"
+  },
+  "tt0907694:1:93": {
+    "id": "tt0907694:1:93",
+    "number": 93,
+    "season": 1,
+    "name": "Im Zweifel für die Liebe",
+    "imdb_id": "tt1545888",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1545888/img"
+  },
+  "tt0907694:1:94": {
+    "id": "tt0907694:1:94",
+    "number": 94,
+    "season": 1,
+    "name": "Wohin du auch gehst",
+    "imdb_id": "tt1545890",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1545890/img"
+  },
+  "tt0907694:1:95": {
+    "id": "tt0907694:1:95",
+    "number": 95,
+    "season": 1,
+    "name": "Liebe am Horizont",
+    "imdb_id": "tt1545889",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1545889/img"
+  },
+  "tt0907694:1:96": {
+    "id": "tt0907694:1:96",
+    "number": 96,
+    "season": 1,
+    "name": "Wenn das Herz zerbricht",
+    "imdb_id": "tt1670117",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1670117/img"
+  },
+  "tt0907694:1:97": {
+    "id": "tt0907694:1:97",
+    "number": 97,
+    "season": 1,
+    "name": "Flügel der Liebe",
+    "imdb_id": "tt1702299",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1702299/img"
+  },
+  "tt0907694:1:98": {
+    "id": "tt0907694:1:98",
+    "number": 98,
+    "season": 1,
+    "name": "Lords lügen nicht",
+    "imdb_id": "tt1729996",
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1729996/img"
+  },
+  "tt0907694:1:99": {
+    "id": "tt0907694:1:99",
+    "number": 99,
+    "season": 1,
+    "name": "Herzensfragen",
+    "imdb_id": "tt1794473",
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1794473/img"
+  },
+  "tt0907694:1:100": {
+    "id": "tt0907694:1:100",
+    "number": 100,
+    "season": 1,
+    "name": "Sonntagskinder",
+    "imdb_id": "tt1804980",
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt1804980/img"
+  },
+  "tt0907694:1:103": {
+    "id": "tt0907694:1:103",
+    "number": 103,
+    "season": 1,
+    "name": "Verlobt, verliebt, verwirrt",
+    "imdb_id": "tt2050248",
+    "overview": "Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist.",
+    "poster": "https://www.zdf.de/assets/verlobt-verliebt-verwirrt-100~1920x1080?cb=1745830743700"
+  },
+  "tt0907694:1:104": {
+    "id": "tt0907694:1:104",
+    "number": 104,
+    "season": 1,
+    "name": "Der gestohlene Sommer",
+    "imdb_id": "tt2050247",
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt2050247/img"
+  },
+  "tt0907694:1:105": {
+    "id": "tt0907694:1:105",
+    "number": 105,
+    "season": 1,
+    "name": "Englischer Wein",
+    "imdb_id": "tt2098382",
+    "overview": "Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-englischer-wein-104~1920x1080?cb=1744711026467"
+  },
+  "tt0907694:1:106": {
+    "id": "tt0907694:1:106",
+    "number": 106,
+    "season": 1,
+    "name": "Gefährliche Brandung",
+    "imdb_id": "tt2122084",
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt2122084/img"
+  },
+  "tt0907694:1:109": {
+    "id": "tt0907694:1:109",
+    "number": 109,
+    "season": 1,
+    "name": "Ungezügelt ins Glück",
+    "imdb_id": "tt2154411",
+    "overview": "Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern.",
+    "poster": "https://www.zdf.de/assets/ungezuegelt-ins-glueck-100~1920x1080?cb=1744907251956"
+  },
+  "tt0907694:1:110": {
+    "id": "tt0907694:1:110",
+    "number": 110,
+    "season": 1,
+    "name": "Das Geheimnis der weißen Taube",
+    "imdb_id": "tt2315165",
+    "overview": "Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit.",
+    "poster": "https://www.zdf.de/assets/das-geheimnis-der-weissen-taube-100~1920x1080?cb=1746022269147"
+  },
+  "tt0907694:1:111": {
+    "id": "tt0907694:1:111",
+    "number": 111,
+    "season": 1,
+    "name": "Die falsche Nonne",
+    "imdb_id": "tt2366178",
+    "overview": "Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-die-falsche-nonne-104~1920x1080?cb=1793023905964"
+  },
+  "tt0907694:1:112": {
+    "id": "tt0907694:1:112",
+    "number": 112,
+    "season": 1,
+    "name": "In der Mitte eines Lebens",
+    "imdb_id": "tt2402646",
+    "overview": "Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken.",
+    "poster": "https://www.zdf.de/assets/in-der-mitte-des-lebens-100~1920x1080?cb=1578559755191"
+  },
+  "tt0907694:1:113": {
+    "id": "tt0907694:1:113",
+    "number": 113,
+    "season": 1,
+    "name": "Die andere Frau, Teil 1",
+    "imdb_id": "tt3959970",
+    "overview": "Rosamunde Pilcher Liebesfilm (2012). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3959970/img"
+  },
+  "tt0907694:1:114": {
+    "id": "tt0907694:1:114",
+    "number": 114,
+    "season": 1,
+    "name": "Die andere Frau, Teil 2",
+    "imdb_id": "tt2169404",
+    "overview": "Rosamunde Pilcher Liebesfilm (2012). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt2169404/img"
+  },
+  "tt0907694:1:115": {
+    "id": "tt0907694:1:115",
+    "number": 115,
+    "season": 1,
+    "name": "Eine Frage der Ehre",
+    "imdb_id": "tt2592426",
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt2592426/img"
+  },
+  "tt0907694:1:116": {
+    "id": "tt0907694:1:116",
+    "number": 116,
+    "season": 1,
+    "name": "Die Frau auf der Klippe",
+    "imdb_id": "tt2761046",
+    "overview": "Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall.",
+    "poster": "https://www.zdf.de/assets/die-frau-auf-der-klippe-100~1920x1080?cb=1793023515200"
+  },
+  "tt0907694:1:117": {
+    "id": "tt0907694:1:117",
+    "number": 117,
+    "season": 1,
+    "name": "Schlangen im Paradies",
+    "imdb_id": "tt2831116",
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt2831116/img"
+  },
+  "tt0907694:1:118": {
+    "id": "tt0907694:1:118",
+    "number": 118,
+    "season": 1,
+    "name": "Die versprochene Braut",
+    "imdb_id": "tt3128154",
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3128154/img"
+  },
+  "tt0907694:1:119": {
+    "id": "tt0907694:1:119",
+    "number": 119,
+    "season": 1,
+    "name": "Alte Herzen rosten nicht",
+    "imdb_id": "tt3293750",
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3293750/img"
+  },
+  "tt0907694:1:120": {
+    "id": "tt0907694:1:120",
+    "number": 120,
+    "season": 1,
+    "name": "Zu hoch geflogen",
+    "imdb_id": "tt3443090",
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3443090/img"
+  },
+  "tt0907694:1:121": {
+    "id": "tt0907694:1:121",
+    "number": 121,
+    "season": 1,
+    "name": "Besetzte Herzen",
+    "imdb_id": "tt3332888",
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3332888/img"
+  },
+  "tt0907694:1:122": {
+    "id": "tt0907694:1:122",
+    "number": 122,
+    "season": 1,
+    "name": "Evitas Rache",
+    "imdb_id": "tt3132252",
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3132252/img"
+  },
+  "tt0907694:1:123": {
+    "id": "tt0907694:1:123",
+    "number": 123,
+    "season": 1,
+    "name": "Mein unbekanntes Herz",
+    "imdb_id": "tt3954226",
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3954226/img"
+  },
+  "tt0907694:1:124": {
+    "id": "tt0907694:1:124",
+    "number": 124,
+    "season": 1,
+    "name": "Anwälte küsst man nicht",
+    "imdb_id": "tt3954140",
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3954140/img"
+  },
+  "tt0907694:1:125": {
+    "id": "tt0907694:1:125",
+    "number": 125,
+    "season": 1,
+    "name": "Vertrauen ist gut, verlieben ist besser",
+    "imdb_id": "tt3901820",
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt3901820/img"
+  },
+  "tt0907694:1:126": {
+    "id": "tt0907694:1:126",
+    "number": 126,
+    "season": 1,
+    "name": "Ghostwriter",
+    "imdb_id": "tt5921002",
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt5921002/img"
+  },
+  "tt0907694:1:127": {
+    "id": "tt0907694:1:127",
+    "number": 127,
+    "season": 1,
+    "name": "Wahlversprechen und andere Lügen",
+    "imdb_id": "tt6058140",
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt6058140/img"
+  },
+  "tt0907694:1:128": {
+    "id": "tt0907694:1:128",
+    "number": 128,
+    "season": 1,
+    "name": "Ein einziger Kuss",
+    "imdb_id": "tt18155194",
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt18155194/img"
+  },
+  "tt0907694:1:129": {
+    "id": "tt0907694:1:129",
+    "number": 129,
+    "season": 1,
+    "name": "Rundum glücklich",
+    "imdb_id": "tt3905430",
+    "overview": "Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume.",
+    "poster": "https://www.zdf.de/assets/rundum-gluecklich-100~1920x1080?cb=1738935862085"
+  },
+  "tt0907694:1:130": {
+    "id": "tt0907694:1:130",
+    "number": 130,
+    "season": 1,
+    "name": "Vollkommen unerwartet",
+    "imdb_id": "tt5376696",
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt5376696/img"
+  },
+  "tt0907694:1:131": {
+    "id": "tt0907694:1:131",
+    "number": 131,
+    "season": 1,
+    "name": "Liebe, Diebe, Diamanten",
+    "imdb_id": "tt5205186",
+    "overview": "Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-liebe-diebe-diamanten-102~1920x1080?cb=1793024107343"
+  },
+  "tt0907694:1:132": {
+    "id": "tt0907694:1:132",
+    "number": 132,
+    "season": 1,
+    "name": "Argentinischer Tango",
+    "imdb_id": "tt4837404",
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt4837404/img"
+  },
+  "tt0907694:1:133": {
+    "id": "tt0907694:1:133",
+    "number": 133,
+    "season": 1,
+    "name": "Lizenz zum Seitensprung",
+    "imdb_id": "tt5295330",
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt5295330/img"
+  },
+  "tt0907694:1:134": {
+    "id": "tt0907694:1:134",
+    "number": 134,
+    "season": 1,
+    "name": "Schutzengel",
+    "imdb_id": "tt5580156",
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt5580156/img"
+  },
+  "tt0907694:1:135": {
+    "id": "tt0907694:1:135",
+    "number": 135,
+    "season": 1,
+    "name": "Ein Doktor & drei Frauen",
+    "imdb_id": "tt9038080",
+    "overview": "Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand.",
+    "poster": "https://www.zdf.de/assets/doktor-und-drei-frauen-100~1920x1080?cb=1766147846819"
+  },
+  "tt0907694:1:136": {
+    "id": "tt0907694:1:136",
+    "number": 136,
+    "season": 1,
+    "name": "Ex & Liebe",
+    "imdb_id": "tt6136678",
+    "overview": "Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-ex-und-liebe-102~1920x1080?cb=1680097215435"
+  },
+  "tt0907694:1:137": {
+    "id": "tt0907694:1:137",
+    "number": 137,
+    "season": 1,
+    "name": "Erdbeeren im Frühling",
+    "imdb_id": "tt6270250",
+    "overview": "Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen.",
+    "poster": "https://www.zdf.de/assets/erdbeeren-im-fruehling-106~1920x1080?cb=1696515866401"
+  },
+  "tt0907694:1:138": {
+    "id": "tt0907694:1:138",
+    "number": 138,
+    "season": 1,
+    "name": "Haustausch mit Hindernissen",
+    "imdb_id": "tt6426868",
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt6426868/img"
+  },
+  "tt0907694:1:139": {
+    "id": "tt0907694:1:139",
+    "number": 139,
+    "season": 1,
+    "name": "Wie von einem anderen Stern",
+    "imdb_id": "tt5940862",
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt5940862/img"
+  },
+  "tt0907694:1:140": {
+    "id": "tt0907694:1:140",
+    "number": 140,
+    "season": 1,
+    "name": "Fast noch verheiratet",
+    "imdb_id": "tt6387446",
+    "overview": "Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert.",
+    "poster": "https://www.zdf.de/assets/fast-verheiratet-100~1920x1080?cb=1575469007851"
+  },
+  "tt0907694:1:141": {
+    "id": "tt0907694:1:141",
+    "number": 141,
+    "season": 1,
+    "name": "Nie wieder Klassentreffen",
+    "imdb_id": "tt7294684",
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt7294684/img"
+  },
+  "tt0907694:1:142": {
+    "id": "tt0907694:1:142",
+    "number": 142,
+    "season": 1,
+    "name": "Das Gespenst von Cassley",
+    "imdb_id": "tt7565710",
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt7565710/img"
+  },
+  "tt0907694:1:143": {
+    "id": "tt0907694:1:143",
+    "number": 143,
+    "season": 1,
+    "name": "Wenn Fische lächeln",
+    "imdb_id": "tt7652188",
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt7652188/img"
+  },
+  "tt0907694:1:144": {
+    "id": "tt0907694:1:144",
+    "number": 144,
+    "season": 1,
+    "name": "Geerbtes Glück",
+    "imdb_id": "tt7858832",
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt7858832/img"
+  },
+  "tt0907694:1:145": {
+    "id": "tt0907694:1:145",
+    "number": 145,
+    "season": 1,
+    "name": "Das Vermächtnis unseres Vaters",
+    "imdb_id": "tt8103280",
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt8103280/img"
+  },
+  "tt0907694:1:146": {
+    "id": "tt0907694:1:146",
+    "number": 146,
+    "season": 1,
+    "name": "Nanny verzweifelt gesucht",
+    "imdb_id": "tt7771608",
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt7771608/img"
+  },
+  "tt0907694:1:147": {
+    "id": "tt0907694:1:147",
+    "number": 147,
+    "season": 1,
+    "name": "Wo Dein Herz wohnt",
+    "imdb_id": "tt9089702",
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt9089702/img"
+  },
+  "tt0907694:1:148": {
+    "id": "tt0907694:1:148",
+    "number": 148,
+    "season": 1,
+    "name": "Das Geheimnis der Blumeninsel",
+    "imdb_id": "tt9401328",
+    "overview": "Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-das-geheimnis-der-blumeninsel-102~1920x1080?cb=1544345904588"
+  },
+  "tt0907694:1:149": {
+    "id": "tt0907694:1:149",
+    "number": 149,
+    "season": 1,
+    "name": "Morgens stürmisch, abends Liebe",
+    "imdb_id": "tt9401344",
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt9401344/img"
+  },
+  "tt0907694:1:150": {
+    "id": "tt0907694:1:150",
+    "number": 150,
+    "season": 1,
+    "name": "Die Braut meines Bruders",
+    "imdb_id": "tt9740242",
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt9740242/img"
+  },
+  "tt0907694:1:151": {
+    "id": "tt0907694:1:151",
+    "number": 151,
+    "season": 1,
+    "name": "Schwiegertöchter",
+    "imdb_id": "tt9048744",
+    "overview": "Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-schwiegertoechter-102~1920x1080?cb=1749544149996"
+  },
+  "tt0907694:1:152": {
+    "id": "tt0907694:1:152",
+    "number": 152,
+    "season": 1,
+    "name": "Pralinen zum Frühstück",
+    "imdb_id": "tt10917356",
+    "overview": "Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen.",
+    "poster": "https://www.zdf.de/assets/pralinen-zum-fruehstueck-102~1920x1080?cb=1781704277805"
+  },
+  "tt0907694:1:153": {
+    "id": "tt0907694:1:153",
+    "number": 153,
+    "season": 1,
+    "name": "Raus in den Sturm",
+    "imdb_id": "tt10974400",
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt10974400/img"
+  },
+  "tt0907694:1:154": {
+    "id": "tt0907694:1:154",
+    "number": 154,
+    "season": 1,
+    "name": "Der magische Bus",
+    "imdb_id": "tt11157780",
+    "overview": "Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag.",
+    "poster": "https://www.zdf.de/assets/magisch-bus-100~1920x1080?cb=1572876710440"
+  },
+  "tt0907694:1:155": {
+    "id": "tt0907694:1:155",
+    "number": 155,
+    "season": 1,
+    "name": "Meine Cousine, die Liebe und ich",
+    "imdb_id": "tt11097478",
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt11097478/img"
+  },
+  "tt0907694:1:156": {
+    "id": "tt0907694:1:156",
+    "number": 156,
+    "season": 1,
+    "name": "Von Tee und Liebe",
+    "imdb_id": "tt11494832",
+    "overview": "Rosamunde Pilcher Liebesfilm (2020). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt11494832/img"
+  },
+  "tt0907694:1:157": {
+    "id": "tt0907694:1:157",
+    "number": 157,
+    "season": 1,
+    "name": "Falsches Leben, wahre Liebe",
+    "imdb_id": "tt11750250",
+    "overview": "Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an.",
+    "poster": "https://www.zdf.de/assets/falschesleben-102~1920x1080?cb=1696515723171"
+  },
+  "tt0907694:1:158": {
+    "id": "tt0907694:1:158",
+    "number": 158,
+    "season": 1,
+    "name": "Stadt, Land, Kuss",
+    "imdb_id": "tt13625812",
+    "overview": "Rosamunde Pilcher Liebesfilm (2021). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt13625812/img"
+  },
+  "tt0907694:1:159": {
+    "id": "tt0907694:1:159",
+    "number": 159,
+    "season": 1,
+    "name": "Wie verhext",
+    "imdb_id": "tt14338314",
+    "overview": "Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will.",
+    "poster": "https://www.zdf.de/assets/wie-verhext-102~1920x1080?cb=1751274370663"
+  },
+  "tt0907694:1:160": {
+    "id": "tt0907694:1:160",
+    "number": 160,
+    "season": 1,
+    "name": "Herzensläufe",
+    "imdb_id": "tt15140552",
+    "overview": "Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit.",
+    "poster": "https://www.zdf.de/assets/herzenslaeufe-100~1920x1080?cb=1790922946174"
+  },
+  "tt0907694:1:161": {
+    "id": "tt0907694:1:161",
+    "number": 161,
+    "season": 1,
+    "name": "Der Stoff, aus dem Träume sind",
+    "imdb_id": "tt15478660",
+    "overview": "Rosamunde Pilcher Liebesfilm (2021). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt15478660/img"
+  },
+  "tt0907694:1:162": {
+    "id": "tt0907694:1:162",
+    "number": 162,
+    "season": 1,
+    "name": "Im Siebten Himmel",
+    "imdb_id": "tt13601238",
+    "overview": "Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall.",
+    "poster": "https://www.zdf.de/assets/rosamunde-pilcher-im-siebten-himmel-102~1920x1080?cb=1638535290427"
+  },
+  "tt0907694:1:163": {
+    "id": "tt0907694:1:163",
+    "number": 163,
+    "season": 1,
+    "name": "Vier Luftballons und ein Todesfall",
+    "imdb_id": "tt16796266",
+    "overview": "Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil.",
+    "poster": "https://www.zdf.de/assets/vier-luftballons-und-ein-todesfall-100~1920x1080?cb=1790581314387"
+  },
+  "tt0907694:1:164": {
+    "id": "tt0907694:1:164",
+    "number": 164,
+    "season": 1,
+    "name": "Die Elster und der Kapitän",
+    "imdb_id": "tt18377966",
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt18377966/img"
+  },
+  "tt0907694:1:165": {
+    "id": "tt0907694:1:165",
+    "number": 165,
+    "season": 1,
+    "name": "Liebe ist unberechenbar",
+    "imdb_id": "tt20124474",
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt20124474/img"
+  },
+  "tt0907694:1:166": {
+    "id": "tt0907694:1:166",
+    "number": 166,
+    "season": 1,
+    "name": "Liebe und andere Schätze",
+    "imdb_id": "tt15680476",
+    "overview": "Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben.",
+    "poster": "https://www.zdf.de/assets/liebe-und-andere-schaetze-100~1920x1080?cb=1779100936024"
+  },
+  "tt0907694:1:167": {
+    "id": "tt0907694:1:167",
+    "number": 167,
+    "season": 1,
+    "name": "Hochzeitstag",
+    "imdb_id": "tt22038482",
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt22038482/img"
+  },
+  "tt0907694:1:168": {
+    "id": "tt0907694:1:168",
+    "number": 168,
+    "season": 1,
+    "name": "Liebe ist die beste Therapie",
+    "imdb_id": "tt26767892",
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt26767892/img"
+  },
+  "tt0907694:1:169": {
+    "id": "tt0907694:1:169",
+    "number": 169,
+    "season": 1,
+    "name": "Wenn ich dich wiederfinde",
+    "imdb_id": "tt27349270",
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt27349270/img"
+  },
+  "tt0907694:1:170": {
+    "id": "tt0907694:1:170",
+    "number": 170,
+    "season": 1,
+    "name": "Schlagzeile Liebe",
+    "imdb_id": "tt28565529",
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt28565529/img"
+  },
+  "tt0907694:1:171": {
+    "id": "tt0907694:1:171",
+    "number": 171,
+    "season": 1,
+    "name": "Amys Wunschkind",
+    "imdb_id": "tt29716178",
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt29716178/img"
+  },
+  "tt0907694:1:172": {
+    "id": "tt0907694:1:172",
+    "number": 172,
+    "season": 1,
+    "name": "Frühstück bei Tessa",
+    "imdb_id": "tt30783580",
+    "overview": "Rosamunde Pilcher Liebesfilm (2024). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt30783580/img"
+  },
+  "tt0907694:1:173": {
+    "id": "tt0907694:1:173",
+    "number": 173,
+    "season": 1,
+    "name": "Verliebt in einen Butler",
+    "imdb_id": "tt33086345",
+    "overview": "Rosamunde Pilcher Liebesfilm (2024). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt33086345/img"
+  },
+  "tt0907694:1:174": {
+    "id": "tt0907694:1:174",
+    "number": 174,
+    "season": 1,
+    "name": "Jahrestag",
+    "imdb_id": "tt34824149",
+    "overview": "Rosamunde Pilcher Liebesfilm (2025). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt34824149/img"
+  },
+  "tt0907694:1:175": {
+    "id": "tt0907694:1:175",
+    "number": 175,
+    "season": 1,
+    "name": "Wer immer du bist",
+    "imdb_id": "tt38098292",
+    "overview": "Rosamunde Pilcher Liebesfilm (2025). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "poster": "https://images.metahub.space/poster/medium/tt38098292/img"
+  },
+  "tt0907694:1:176": {
+    "id": "tt0907694:1:176",
+    "number": 176,
+    "season": 1,
+    "name": "Einspruch für die Liebe",
+    "imdb_id": "tt39074725",
+    "overview": "Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen.",
+    "poster": "https://epg-image.zdf.de/fotobase-webdelivery/images/14639eee-55be-4062-8284-904f5faf3e73?layout=768x432"
+  },
+  "tt0907694:1:177": {
+    "id": "tt0907694:1:177",
+    "number": 177,
+    "season": 1,
+    "name": "Wo Liebe aufhört und wo sie beginnt",
+    "imdb_id": "tt39539085",
+    "overview": "Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück.",
+    "poster": "https://www.zdf.de/assets/hero-pilcher-wo-die-liebe-aufhoert-100~1920x1080?cb=1776694369640"
+  },
+  "tt0907694:1:178": {
+    "id": "tt0907694:1:178",
+    "number": 178,
+    "season": 1,
+    "name": "Die Glücksbringerin",
+    "imdb_id": "tt44914855",
+    "overview": "Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding.",
+    "poster": "https://epg-image.zdf.de/fotobase-webdelivery/images/45cdebaf-8fbe-498c-aafd-57730994f4d4?layout=768x432"
+  }
+};
+const SERIES_VIDEOS = [
+  {
+    "id": "tt0907694:1:1",
+    "name": "Stürmische Begegnung",
+    "title": "Stürmische Begegnung",
+    "season": 1,
+    "number": 1,
+    "episode": 1,
+    "overview": "Rosamunde Pilcher Liebesfilm (1993). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0108240/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:2",
+    "name": "Wilder Thymian",
+    "title": "Wilder Thymian",
+    "season": 1,
+    "number": 2,
+    "episode": 2,
+    "overview": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0111721/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:3",
+    "name": "Karussell des Lebens",
+    "title": "Karussell des Lebens",
+    "season": 1,
+    "number": 3,
+    "episode": 3,
+    "overview": "Rosamunde Pilcher Liebesfilm (1994). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0110245/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:4",
+    "name": "Wechselspiel der Liebe",
+    "title": "Wechselspiel der Liebe",
+    "season": 1,
+    "number": 4,
+    "episode": 4,
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0114903/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:5",
+    "name": "Das Ende eines Sommers",
+    "title": "Das Ende eines Sommers",
+    "season": 1,
+    "number": 5,
+    "episode": 5,
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0123821/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:6",
+    "name": "Sommer am Meer",
+    "title": "Sommer am Meer",
+    "season": 1,
+    "number": 6,
+    "episode": 6,
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0114498/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:7",
+    "name": "Schlafender Tiger",
+    "title": "Schlafender Tiger",
+    "season": 1,
+    "number": 7,
+    "episode": 7,
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0114353/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:8",
+    "name": "Wolken am Horizont",
+    "title": "Wolken am Horizont",
+    "season": 1,
+    "number": 8,
+    "episode": 8,
+    "overview": "Rosamunde Pilcher Liebesfilm (1995). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0126124/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:9",
+    "name": "Schneesturm im Frühling",
+    "title": "Schneesturm im Frühling",
+    "season": 1,
+    "number": 9,
+    "episode": 9,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0117564/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:10",
+    "name": "Lichterspiele",
+    "title": "Lichterspiele",
+    "season": 1,
+    "number": 10,
+    "episode": 10,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0116870/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:11",
+    "name": "September: Teil 1",
+    "title": "September: Teil 1",
+    "season": 1,
+    "number": 11,
+    "episode": 11,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15729598/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:12",
+    "name": "September: Teil 2",
+    "title": "September: Teil 2",
+    "season": 1,
+    "number": 12,
+    "episode": 12,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15741176/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:13",
+    "name": "Das Haus an der Küste",
+    "title": "Das Haus an der Küste",
+    "season": 1,
+    "number": 13,
+    "episode": 13,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0116498/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:14",
+    "name": "Eine besondere Liebe",
+    "title": "Eine besondere Liebe",
+    "season": 1,
+    "number": 14,
+    "episode": 14,
+    "overview": "Rosamunde Pilcher Liebesfilm (1996). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0115659/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:15",
+    "name": "Wind der Hoffnung",
+    "title": "Wind der Hoffnung",
+    "season": 1,
+    "number": 15,
+    "episode": 15,
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0120517/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:16",
+    "name": "Irrwege des Herzens",
+    "title": "Irrwege des Herzens",
+    "season": 1,
+    "number": 16,
+    "episode": 16,
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0119384/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:17",
+    "name": "Stunden der Entscheidung",
+    "title": "Stunden der Entscheidung",
+    "season": 1,
+    "number": 17,
+    "episode": 17,
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0120234/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:18",
+    "name": "Die zweite Chance",
+    "title": "Die zweite Chance",
+    "season": 1,
+    "number": 18,
+    "episode": 18,
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0128860/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:19",
+    "name": "Zwei Schwestern",
+    "title": "Zwei Schwestern",
+    "season": 1,
+    "number": 19,
+    "episode": 19,
+    "overview": "Rosamunde Pilcher Liebesfilm (1997). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0135071/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:20",
+    "name": "Der Preis der Liebe",
+    "title": "Der Preis der Liebe",
+    "season": 1,
+    "number": 20,
+    "episode": 20,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0146041/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:21",
+    "name": "Heimkehr: Teil 1",
+    "title": "Heimkehr: Teil 1",
+    "season": 1,
+    "number": 21,
+    "episode": 21,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15729564/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:22",
+    "name": "Heimkehr: Teil 2",
+    "title": "Heimkehr: Teil 2",
+    "season": 1,
+    "number": 22,
+    "episode": 22,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15729560/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:23",
+    "name": "Rückkehr ins Paradies",
+    "title": "Rückkehr ins Paradies",
+    "season": 1,
+    "number": 23,
+    "episode": 23,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0170520/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:24",
+    "name": "Dornen im Tal der Blumen",
+    "title": "Dornen im Tal der Blumen",
+    "season": 1,
+    "number": 24,
+    "episode": 24,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0177180/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:25",
+    "name": "Melodie der Herzen",
+    "title": "Melodie der Herzen",
+    "season": 1,
+    "number": 25,
+    "episode": 25,
+    "overview": "Rosamunde Pilcher Liebesfilm (1998). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0181794/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:26",
+    "name": "Magie der Liebe",
+    "title": "Magie der Liebe",
+    "season": 1,
+    "number": 26,
+    "episode": 26,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0184868/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:27",
+    "name": "Rosen im Sturm",
+    "title": "Rosen im Sturm",
+    "season": 1,
+    "number": 27,
+    "episode": 27,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0188183/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:28",
+    "name": "Das große Erbe: Teil 1",
+    "title": "Das große Erbe: Teil 1",
+    "season": 1,
+    "number": 28,
+    "episode": 28,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15740730/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:29",
+    "name": "Das große Erbe: Teil 2",
+    "title": "Das große Erbe: Teil 2",
+    "season": 1,
+    "number": 29,
+    "episode": 29,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15740738/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:30",
+    "name": "Klippen der Liebe",
+    "title": "Klippen der Liebe",
+    "season": 1,
+    "number": 30,
+    "episode": 30,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0217605/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:31",
+    "name": "Möwen im Wind",
+    "title": "Möwen im Wind",
+    "season": 1,
+    "number": 31,
+    "episode": 31,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0222330/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:32",
+    "name": "Blüte des Lebens",
+    "title": "Blüte des Lebens",
+    "season": 1,
+    "number": 32,
+    "episode": 32,
+    "overview": "Rosamunde Pilcher Liebesfilm (1999). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0226390/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:33",
+    "name": "Der lange Weg zum Glück",
+    "title": "Der lange Weg zum Glück",
+    "season": 1,
+    "number": 33,
+    "episode": 33,
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0230712/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:34",
+    "name": "Zeit der Erkenntnis",
+    "title": "Zeit der Erkenntnis",
+    "season": 1,
+    "number": 34,
+    "episode": 34,
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0244176/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:35",
+    "name": "Zerrissene Herzen",
+    "title": "Zerrissene Herzen",
+    "season": 1,
+    "number": 35,
+    "episode": 35,
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0262737/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:36",
+    "name": "Ruf der Vergangenheit",
+    "title": "Ruf der Vergangenheit",
+    "season": 1,
+    "number": 36,
+    "episode": 36,
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0266913/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:37",
+    "name": "Im Licht des Feuers",
+    "title": "Im Licht des Feuers",
+    "season": 1,
+    "number": 37,
+    "episode": 37,
+    "overview": "Rosamunde Pilcher Liebesfilm (2000). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0271760/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:38",
+    "name": "Die Rose von Kerrymore",
+    "title": "Die Rose von Kerrymore",
+    "season": 1,
+    "number": 38,
+    "episode": 38,
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0272817/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:39",
+    "name": "Küste der Träume",
+    "title": "Küste der Träume",
+    "season": 1,
+    "number": 39,
+    "episode": 39,
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0275637/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:40",
+    "name": "Kinder des Glücks",
+    "title": "Kinder des Glücks",
+    "season": 1,
+    "number": 40,
+    "episode": 40,
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0300428/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:41",
+    "name": "Wind über dem Fluss",
+    "title": "Wind über dem Fluss",
+    "season": 1,
+    "number": 41,
+    "episode": 41,
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0301782/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:42",
+    "name": "Blumen im Regen",
+    "title": "Blumen im Regen",
+    "season": 1,
+    "number": 42,
+    "episode": 42,
+    "overview": "Rosamunde Pilcher Liebesfilm (2001). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0304642/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:43",
+    "name": "Wenn nur noch Liebe zählt",
+    "title": "Wenn nur noch Liebe zählt",
+    "season": 1,
+    "number": 43,
+    "episode": 43,
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0310081/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:44",
+    "name": "Morgen träumen wir gemeinsam",
+    "title": "Morgen träumen wir gemeinsam",
+    "season": 1,
+    "number": 44,
+    "episode": 44,
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0316507/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:45",
+    "name": "Mit den Augen der Liebe",
+    "title": "Mit den Augen der Liebe",
+    "season": 1,
+    "number": 45,
+    "episode": 45,
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0337119/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:46",
+    "name": "Bis ans Ende der Welt",
+    "title": "Bis ans Ende der Welt",
+    "season": 1,
+    "number": 46,
+    "episode": 46,
+    "overview": "Rosamunde Pilcher Liebesfilm (2002). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0345873/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:47",
+    "name": "Sternschnuppen im August",
+    "title": "Sternschnuppen im August",
+    "season": 1,
+    "number": 47,
+    "episode": 47,
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0348739/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:48",
+    "name": "Paradies der Träume",
+    "title": "Paradies der Träume",
+    "season": 1,
+    "number": 48,
+    "episode": 48,
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0353957/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:49",
+    "name": "Flamme der Liebe",
+    "title": "Flamme der Liebe",
+    "season": 1,
+    "number": 49,
+    "episode": 49,
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0357109/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:50",
+    "name": "Gewissheit des Herzens",
+    "title": "Gewissheit des Herzens",
+    "season": 1,
+    "number": 50,
+    "episode": 50,
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0386755/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:51",
+    "name": "Wintersonne (1+2)",
+    "title": "Wintersonne (1+2)",
+    "season": 1,
+    "number": 51,
+    "episode": 51,
+    "overview": "Rosamunde Pilcher Liebesfilm (2003). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15727968/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:52",
+    "name": "Federn im Wind",
+    "title": "Federn im Wind",
+    "season": 1,
+    "number": 52,
+    "episode": 52,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0396843/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:53",
+    "name": "Wege der Liebe",
+    "title": "Wege der Liebe",
+    "season": 1,
+    "number": 53,
+    "episode": 53,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0393657/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:54",
+    "name": "Solange es dich gibt",
+    "title": "Solange es dich gibt",
+    "season": 1,
+    "number": 54,
+    "episode": 54,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0433629/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:55",
+    "name": "Liebe im Spiel",
+    "title": "Liebe im Spiel",
+    "season": 1,
+    "number": 55,
+    "episode": 55,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0410534/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:56",
+    "name": "Traum eines Sommers",
+    "title": "Traum eines Sommers",
+    "season": 1,
+    "number": 56,
+    "episode": 56,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0450119/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:57",
+    "name": "Tiefe der Gefühle",
+    "title": "Tiefe der Gefühle",
+    "season": 1,
+    "number": 57,
+    "episode": 57,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0432346/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:58",
+    "name": "Dem Himmel so nah",
+    "title": "Dem Himmel so nah",
+    "season": 1,
+    "number": 58,
+    "episode": 58,
+    "overview": "Rosamunde Pilcher Liebesfilm (2004). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0450116/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:59",
+    "name": "Vermächtnis der Liebe",
+    "title": "Vermächtnis der Liebe",
+    "season": 1,
+    "number": 59,
+    "episode": 59,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0450120/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:60",
+    "name": "Königin der Nacht",
+    "title": "Königin der Nacht",
+    "season": 1,
+    "number": 60,
+    "episode": 60,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0450117/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:61",
+    "name": "Segel der Liebe",
+    "title": "Segel der Liebe",
+    "season": 1,
+    "number": 61,
+    "episode": 61,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0450118/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:62",
+    "name": "Über den Wolken",
+    "title": "Über den Wolken",
+    "season": 1,
+    "number": 62,
+    "episode": 62,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0491128/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:63",
+    "name": "Zauber der Liebe (1+2)",
+    "title": "Zauber der Liebe (1+2)",
+    "season": 1,
+    "number": 63,
+    "episode": 63,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15727726/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:64",
+    "name": "Der Himmel über Cornwall",
+    "title": "Der Himmel über Cornwall",
+    "season": 1,
+    "number": 64,
+    "episode": 64,
+    "overview": "Rosamunde Pilcher Liebesfilm (2005). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0777270/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:65",
+    "name": "Land der Sehnsucht",
+    "title": "Land der Sehnsucht",
+    "season": 1,
+    "number": 65,
+    "episode": 65,
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0497438/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:66",
+    "name": "Sommer des Erwachens",
+    "title": "Sommer des Erwachens",
+    "season": 1,
+    "number": 66,
+    "episode": 66,
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0499557/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:67",
+    "name": "Wo die Liebe begann",
+    "title": "Wo die Liebe begann",
+    "season": 1,
+    "number": 67,
+    "episode": 67,
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0857260/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:68",
+    "name": "Die Liebe ihres Lebens",
+    "title": "Die Liebe ihres Lebens",
+    "season": 1,
+    "number": 68,
+    "episode": 68,
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0872156/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:69",
+    "name": "Und plötzlich war es Liebe",
+    "title": "Und plötzlich war es Liebe",
+    "season": 1,
+    "number": 69,
+    "episode": 69,
+    "overview": "Rosamunde Pilcher Liebesfilm (2006). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0903964/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:71",
+    "name": "Wiedersehen am Fluss",
+    "title": "Wiedersehen am Fluss",
+    "season": 1,
+    "number": 71,
+    "episode": 71,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0943113/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:72",
+    "name": "Sommer der Liebe",
+    "title": "Sommer der Liebe",
+    "season": 1,
+    "number": 72,
+    "episode": 72,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0988802/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:73",
+    "name": "Flügel der Hoffnung",
+    "title": "Flügel der Hoffnung",
+    "season": 1,
+    "number": 73,
+    "episode": 73,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt0988801/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:74",
+    "name": "Der Mann meiner Träume",
+    "title": "Der Mann meiner Träume",
+    "season": 1,
+    "number": 74,
+    "episode": 74,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1096981/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:75",
+    "name": "Sieg der Liebe",
+    "title": "Sieg der Liebe",
+    "season": 1,
+    "number": 75,
+    "episode": 75,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1106607/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:76",
+    "name": "Nebel über Schloss Kilrush",
+    "title": "Nebel über Schloss Kilrush",
+    "season": 1,
+    "number": 76,
+    "episode": 76,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1125243/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:77",
+    "name": "Aus Liebe und Leidenschaft",
+    "title": "Aus Liebe und Leidenschaft",
+    "season": 1,
+    "number": 77,
+    "episode": 77,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1140926/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:78",
+    "name": "Wind über der See",
+    "title": "Wind über der See",
+    "season": 1,
+    "number": 78,
+    "episode": 78,
+    "overview": "Rosamunde Pilcher Liebesfilm (2007). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1150986/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:79",
+    "name": "Pfeile der Liebe",
+    "title": "Pfeile der Liebe",
+    "season": 1,
+    "number": 79,
+    "episode": 79,
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1177749/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:80",
+    "name": "Melodie der Liebe",
+    "title": "Melodie der Liebe",
+    "season": 1,
+    "number": 80,
+    "episode": 80,
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178398/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:81",
+    "name": "Herzen im Wind",
+    "title": "Herzen im Wind",
+    "season": 1,
+    "number": 81,
+    "episode": 81,
+    "overview": "Rosamunde Pilcher Liebesfilm (2008). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178399/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:84",
+    "name": "Gezeiten der Liebe",
+    "title": "Gezeiten der Liebe",
+    "season": 1,
+    "number": 84,
+    "episode": 84,
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178400/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:85",
+    "name": "Herzenssehnsucht",
+    "title": "Herzenssehnsucht",
+    "season": 1,
+    "number": 85,
+    "episode": 85,
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178401/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:86",
+    "name": "Eine Liebe im Herbst",
+    "title": "Eine Liebe im Herbst",
+    "season": 1,
+    "number": 86,
+    "episode": 86,
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178402/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:87",
+    "name": "Entscheidung des Herzens",
+    "title": "Entscheidung des Herzens",
+    "season": 1,
+    "number": 87,
+    "episode": 87,
+    "overview": "Rosamunde Pilcher Liebesfilm (2009). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1178403/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:88",
+    "name": "Liebe gegen den Rest der Welt",
+    "title": "Liebe gegen den Rest der Welt",
+    "season": 1,
+    "number": 88,
+    "episode": 88,
+    "overview": "Rachel Wilson kehrt nach zwei Jahren in das kleine Dorf Kingscove in Cornwall zurück, das sie eigentlich für immer verlassen wollte.",
+    "thumbnail": "https://www.zdf.de/assets/liebe-gegen-den-rest-der-welt-102~1920x1080?cb=1747395872987",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:89",
+    "name": "Wiedersehen in Rose Abbey",
+    "title": "Wiedersehen in Rose Abbey",
+    "season": 1,
+    "number": 89,
+    "episode": 89,
+    "overview": "Roseanne Brix, Studentin aus Chicago, kommt nach dem Tod ihrer Mutter nach England, um ihren leiblichen Vater zu suchen. Ihr einziger Hinweis ist ein altes Foto ihrer Mutter.",
+    "thumbnail": "https://www.zdf.de/assets/wiedersehen-in-rose-abbey-100~1920x1080?cb=1746798390082",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:90",
+    "name": "Lass es Liebe sein",
+    "title": "Lass es Liebe sein",
+    "season": 1,
+    "number": 90,
+    "episode": 90,
+    "overview": "Eine kurze, schicksalhafte Begegnung zwischen Tom und Natalie, einer jungen Studentin aus Georgien, wird das Leben beider für immer verändern: Sie verlieben sich ineinander.",
+    "thumbnail": "https://www.zdf.de/assets/lass-es-liebe-sein-100~1920x1080?cb=1746450048706",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:93",
+    "name": "Im Zweifel für die Liebe",
+    "title": "Im Zweifel für die Liebe",
+    "season": 1,
+    "number": 93,
+    "episode": 93,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1545888/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:94",
+    "name": "Wohin du auch gehst",
+    "title": "Wohin du auch gehst",
+    "season": 1,
+    "number": 94,
+    "episode": 94,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1545890/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:95",
+    "name": "Liebe am Horizont",
+    "title": "Liebe am Horizont",
+    "season": 1,
+    "number": 95,
+    "episode": 95,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1545889/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:96",
+    "name": "Wenn das Herz zerbricht",
+    "title": "Wenn das Herz zerbricht",
+    "season": 1,
+    "number": 96,
+    "episode": 96,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1670117/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:97",
+    "name": "Flügel der Liebe",
+    "title": "Flügel der Liebe",
+    "season": 1,
+    "number": 97,
+    "episode": 97,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1702299/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:98",
+    "name": "Lords lügen nicht",
+    "title": "Lords lügen nicht",
+    "season": 1,
+    "number": 98,
+    "episode": 98,
+    "overview": "Rosamunde Pilcher Liebesfilm (2010). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1729996/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:99",
+    "name": "Herzensfragen",
+    "title": "Herzensfragen",
+    "season": 1,
+    "number": 99,
+    "episode": 99,
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1794473/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:100",
+    "name": "Sonntagskinder",
+    "title": "Sonntagskinder",
+    "season": 1,
+    "number": 100,
+    "episode": 100,
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt1804980/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:103",
+    "name": "Verlobt, verliebt, verwirrt",
+    "title": "Verlobt, verliebt, verwirrt",
+    "season": 1,
+    "number": 103,
+    "episode": 103,
+    "overview": "Emma Waters überredet ihre Freundin Julia Adams, einen Junggesellinnenabschied zu machen. Als Julia einen Kuss versteigern soll, kann sie nicht glauben, wer der Gewinner ist.",
+    "thumbnail": "https://www.zdf.de/assets/verlobt-verliebt-verwirrt-100~1920x1080?cb=1745830743700",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:104",
+    "name": "Der gestohlene Sommer",
+    "title": "Der gestohlene Sommer",
+    "season": 1,
+    "number": 104,
+    "episode": 104,
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt2050247/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:105",
+    "name": "Englischer Wein",
+    "title": "Englischer Wein",
+    "season": 1,
+    "number": 105,
+    "episode": 105,
+    "overview": "Die ehrgeizige Winzerin Hannah Powell, die lange in Frankreich gelebt hat, erhält die Chance ihres Lebens: Sie soll ein Weingut in ihrer Heimat Südengland auf Vordermann bringen.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-englischer-wein-104~1920x1080?cb=1744711026467",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:106",
+    "name": "Gefährliche Brandung",
+    "title": "Gefährliche Brandung",
+    "season": 1,
+    "number": 106,
+    "episode": 106,
+    "overview": "Rosamunde Pilcher Liebesfilm (2011). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt2122084/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:109",
+    "name": "Ungezügelt ins Glück",
+    "title": "Ungezügelt ins Glück",
+    "season": 1,
+    "number": 109,
+    "episode": 109,
+    "overview": "Lord Brooks stellt nach langer Abwesenheit entsetzt fest, dass seine Mutter das Familienanwesen in ein Pferdeasyl verwandelt hat. Er muss sich nun um die Rettung des Erbes kümmern.",
+    "thumbnail": "https://www.zdf.de/assets/ungezuegelt-ins-glueck-100~1920x1080?cb=1744907251956",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:110",
+    "name": "Das Geheimnis der weißen Taube",
+    "title": "Das Geheimnis der weißen Taube",
+    "season": 1,
+    "number": 110,
+    "episode": 110,
+    "overview": "Auktionatorin Stella liebt die alten Schätze, die sie verkauft. Doch im Auktionshaus der Familie ihres Mannes Peter kriselt es seit neustem – und das nicht nur bei ihrer Arbeit.",
+    "thumbnail": "https://www.zdf.de/assets/das-geheimnis-der-weissen-taube-100~1920x1080?cb=1746022269147",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:111",
+    "name": "Die falsche Nonne",
+    "title": "Die falsche Nonne",
+    "season": 1,
+    "number": 111,
+    "episode": 111,
+    "overview": "Bei einem Undercover-Einsatz lernt Polizistin Sabrina Tom kennen.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-die-falsche-nonne-104~1920x1080?cb=1793023905964",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:112",
+    "name": "In der Mitte eines Lebens",
+    "title": "In der Mitte eines Lebens",
+    "season": 1,
+    "number": 112,
+    "episode": 112,
+    "overview": "Ella Dempsey muss nach einem Vorfall ihr ganzes Leben überdenken.",
+    "thumbnail": "https://www.zdf.de/assets/in-der-mitte-des-lebens-100~1920x1080?cb=1578559755191",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:113",
+    "name": "Die andere Frau, Teil 1",
+    "title": "Die andere Frau, Teil 1",
+    "season": 1,
+    "number": 113,
+    "episode": 113,
+    "overview": "Rosamunde Pilcher Liebesfilm (2012). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3959970/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:114",
+    "name": "Die andere Frau, Teil 2",
+    "title": "Die andere Frau, Teil 2",
+    "season": 1,
+    "number": 114,
+    "episode": 114,
+    "overview": "Rosamunde Pilcher Liebesfilm (2012). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt2169404/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:115",
+    "name": "Eine Frage der Ehre",
+    "title": "Eine Frage der Ehre",
+    "season": 1,
+    "number": 115,
+    "episode": 115,
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt2592426/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:116",
+    "name": "Die Frau auf der Klippe",
+    "title": "Die Frau auf der Klippe",
+    "season": 1,
+    "number": 116,
+    "episode": 116,
+    "overview": "Owen erbt das Herrenhaus seines verstorbenen Großonkels in Cornwall.",
+    "thumbnail": "https://www.zdf.de/assets/die-frau-auf-der-klippe-100~1920x1080?cb=1793023515200",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:117",
+    "name": "Schlangen im Paradies",
+    "title": "Schlangen im Paradies",
+    "season": 1,
+    "number": 117,
+    "episode": 117,
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt2831116/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:118",
+    "name": "Die versprochene Braut",
+    "title": "Die versprochene Braut",
+    "season": 1,
+    "number": 118,
+    "episode": 118,
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3128154/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:119",
+    "name": "Alte Herzen rosten nicht",
+    "title": "Alte Herzen rosten nicht",
+    "season": 1,
+    "number": 119,
+    "episode": 119,
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3293750/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:120",
+    "name": "Zu hoch geflogen",
+    "title": "Zu hoch geflogen",
+    "season": 1,
+    "number": 120,
+    "episode": 120,
+    "overview": "Rosamunde Pilcher Liebesfilm (2013). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3443090/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:121",
+    "name": "Besetzte Herzen",
+    "title": "Besetzte Herzen",
+    "season": 1,
+    "number": 121,
+    "episode": 121,
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3332888/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:122",
+    "name": "Evitas Rache",
+    "title": "Evitas Rache",
+    "season": 1,
+    "number": 122,
+    "episode": 122,
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3132252/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:123",
+    "name": "Mein unbekanntes Herz",
+    "title": "Mein unbekanntes Herz",
+    "season": 1,
+    "number": 123,
+    "episode": 123,
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3954226/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:124",
+    "name": "Anwälte küsst man nicht",
+    "title": "Anwälte küsst man nicht",
+    "season": 1,
+    "number": 124,
+    "episode": 124,
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3954140/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:125",
+    "name": "Vertrauen ist gut, verlieben ist besser",
+    "title": "Vertrauen ist gut, verlieben ist besser",
+    "season": 1,
+    "number": 125,
+    "episode": 125,
+    "overview": "Rosamunde Pilcher Liebesfilm (2014). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt3901820/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:126",
+    "name": "Ghostwriter",
+    "title": "Ghostwriter",
+    "season": 1,
+    "number": 126,
+    "episode": 126,
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt5921002/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:127",
+    "name": "Wahlversprechen und andere Lügen",
+    "title": "Wahlversprechen und andere Lügen",
+    "season": 1,
+    "number": 127,
+    "episode": 127,
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt6058140/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:128",
+    "name": "Ein einziger Kuss",
+    "title": "Ein einziger Kuss",
+    "season": 1,
+    "number": 128,
+    "episode": 128,
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt18155194/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:129",
+    "name": "Rundum glücklich",
+    "title": "Rundum glücklich",
+    "season": 1,
+    "number": 129,
+    "episode": 129,
+    "overview": "Die junge Bäckerin Betty Hunter sucht den Mann ihrer Träume.",
+    "thumbnail": "https://www.zdf.de/assets/rundum-gluecklich-100~1920x1080?cb=1738935862085",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:130",
+    "name": "Vollkommen unerwartet",
+    "title": "Vollkommen unerwartet",
+    "season": 1,
+    "number": 130,
+    "episode": 130,
+    "overview": "Rosamunde Pilcher Liebesfilm (2015). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt5376696/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:131",
+    "name": "Liebe, Diebe, Diamanten",
+    "title": "Liebe, Diebe, Diamanten",
+    "season": 1,
+    "number": 131,
+    "episode": 131,
+    "overview": "Richard Johnson kehrt zur Hochzeit der Tochter zurück nach Cornwall.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-liebe-diebe-diamanten-102~1920x1080?cb=1793024107343",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:132",
+    "name": "Argentinischer Tango",
+    "title": "Argentinischer Tango",
+    "season": 1,
+    "number": 132,
+    "episode": 132,
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt4837404/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:133",
+    "name": "Lizenz zum Seitensprung",
+    "title": "Lizenz zum Seitensprung",
+    "season": 1,
+    "number": 133,
+    "episode": 133,
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt5295330/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:134",
+    "name": "Schutzengel",
+    "title": "Schutzengel",
+    "season": 1,
+    "number": 134,
+    "episode": 134,
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt5580156/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:135",
+    "name": "Ein Doktor & drei Frauen",
+    "title": "Ein Doktor & drei Frauen",
+    "season": 1,
+    "number": 135,
+    "episode": 135,
+    "overview": "Dem idyllischen Örtchen St. Mark droht kurz vor der bevorstehenden 500-Jahr-Feier der schleichende Tod. Jetzt verabschiedet sich auch noch der einzige Arzt in den Ruhestand.",
+    "thumbnail": "https://www.zdf.de/assets/doktor-und-drei-frauen-100~1920x1080?cb=1766147846819",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:136",
+    "name": "Ex & Liebe",
+    "title": "Ex & Liebe",
+    "season": 1,
+    "number": 136,
+    "episode": 136,
+    "overview": "Auf dem Weg zu seiner Mutter hat Bruno mit seinem Oldtimer eine Panne, die sein Leben verändern wird. Sophie, die einstige Liebe seines Lebens, steht plötzlich vor ihm.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-ex-und-liebe-102~1920x1080?cb=1680097215435",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:137",
+    "name": "Erdbeeren im Frühling",
+    "title": "Erdbeeren im Frühling",
+    "season": 1,
+    "number": 137,
+    "episode": 137,
+    "overview": "Als die junge Journalistin und Millionenerbin Lilly zur Beerdigung ihres Vaters nach Cornwall zurückkehrt, bricht ihre bisherige Lebensplanung wie ein Kartenhaus zusammen.",
+    "thumbnail": "https://www.zdf.de/assets/erdbeeren-im-fruehling-106~1920x1080?cb=1696515866401",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:138",
+    "name": "Haustausch mit Hindernissen",
+    "title": "Haustausch mit Hindernissen",
+    "season": 1,
+    "number": 138,
+    "episode": 138,
+    "overview": "Rosamunde Pilcher Liebesfilm (2016). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt6426868/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:139",
+    "name": "Wie von einem anderen Stern",
+    "title": "Wie von einem anderen Stern",
+    "season": 1,
+    "number": 139,
+    "episode": 139,
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt5940862/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:140",
+    "name": "Fast noch verheiratet",
+    "title": "Fast noch verheiratet",
+    "season": 1,
+    "number": 140,
+    "episode": 140,
+    "overview": "Siennas Traummann macht ihr einen Heiratsantrag – doch sie zögert.",
+    "thumbnail": "https://www.zdf.de/assets/fast-verheiratet-100~1920x1080?cb=1575469007851",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:141",
+    "name": "Nie wieder Klassentreffen",
+    "title": "Nie wieder Klassentreffen",
+    "season": 1,
+    "number": 141,
+    "episode": 141,
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt7294684/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:142",
+    "name": "Das Gespenst von Cassley",
+    "title": "Das Gespenst von Cassley",
+    "season": 1,
+    "number": 142,
+    "episode": 142,
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt7565710/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:143",
+    "name": "Wenn Fische lächeln",
+    "title": "Wenn Fische lächeln",
+    "season": 1,
+    "number": 143,
+    "episode": 143,
+    "overview": "Rosamunde Pilcher Liebesfilm (2017). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt7652188/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:144",
+    "name": "Geerbtes Glück",
+    "title": "Geerbtes Glück",
+    "season": 1,
+    "number": 144,
+    "episode": 144,
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt7858832/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:145",
+    "name": "Das Vermächtnis unseres Vaters",
+    "title": "Das Vermächtnis unseres Vaters",
+    "season": 1,
+    "number": 145,
+    "episode": 145,
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt8103280/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:146",
+    "name": "Nanny verzweifelt gesucht",
+    "title": "Nanny verzweifelt gesucht",
+    "season": 1,
+    "number": 146,
+    "episode": 146,
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt7771608/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:147",
+    "name": "Wo Dein Herz wohnt",
+    "title": "Wo Dein Herz wohnt",
+    "season": 1,
+    "number": 147,
+    "episode": 147,
+    "overview": "Rosamunde Pilcher Liebesfilm (2018). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt9089702/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:148",
+    "name": "Das Geheimnis der Blumeninsel",
+    "title": "Das Geheimnis der Blumeninsel",
+    "season": 1,
+    "number": 148,
+    "episode": 148,
+    "overview": "Amy Harding hat einen großen Traum. Sie will die verwahrloste Blumenfarm ihrer Großeltern auf den Scilly Islands wieder zum Blühen bringen.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-das-geheimnis-der-blumeninsel-102~1920x1080?cb=1544345904588",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:149",
+    "name": "Morgens stürmisch, abends Liebe",
+    "title": "Morgens stürmisch, abends Liebe",
+    "season": 1,
+    "number": 149,
+    "episode": 149,
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt9401344/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:150",
+    "name": "Die Braut meines Bruders",
+    "title": "Die Braut meines Bruders",
+    "season": 1,
+    "number": 150,
+    "episode": 150,
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt9740242/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:151",
+    "name": "Schwiegertöchter",
+    "title": "Schwiegertöchter",
+    "season": 1,
+    "number": 151,
+    "episode": 151,
+    "overview": "Lynette will den letzten Wunsch ihres verstorbenen Mannes erfüllen und eine Stiftung in seinem Namen gründen. Dafür muss sie aber die Leitung ihrer eigenen Firma abgeben.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-schwiegertoechter-102~1920x1080?cb=1749544149996",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:152",
+    "name": "Pralinen zum Frühstück",
+    "title": "Pralinen zum Frühstück",
+    "season": 1,
+    "number": 152,
+    "episode": 152,
+    "overview": "Annabelle hat ihr Hobby zum Beruf gemacht: Auf Flughäfen ersteigert sie gestrandete und besitzlose Koffer, um sie dann in ihrer Fernsehsendung öffnen zu lassen.",
+    "thumbnail": "https://www.zdf.de/assets/pralinen-zum-fruehstueck-102~1920x1080?cb=1781704277805",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:153",
+    "name": "Raus in den Sturm",
+    "title": "Raus in den Sturm",
+    "season": 1,
+    "number": 153,
+    "episode": 153,
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt10974400/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:154",
+    "name": "Der magische Bus",
+    "title": "Der magische Bus",
+    "season": 1,
+    "number": 154,
+    "episode": 154,
+    "overview": "Olivia macht sich trotz aller Warnungen ihrer Freunde und Kollegen in einem Vintage-Bus selbstständig. Doch schon bei der ersten Reise kommt der erste Rückschlag.",
+    "thumbnail": "https://www.zdf.de/assets/magisch-bus-100~1920x1080?cb=1572876710440",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:155",
+    "name": "Meine Cousine, die Liebe und ich",
+    "title": "Meine Cousine, die Liebe und ich",
+    "season": 1,
+    "number": 155,
+    "episode": 155,
+    "overview": "Rosamunde Pilcher Liebesfilm (2019). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt11097478/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:156",
+    "name": "Von Tee und Liebe",
+    "title": "Von Tee und Liebe",
+    "season": 1,
+    "number": 156,
+    "episode": 156,
+    "overview": "Rosamunde Pilcher Liebesfilm (2020). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt11494832/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:157",
+    "name": "Falsches Leben, wahre Liebe",
+    "title": "Falsches Leben, wahre Liebe",
+    "season": 1,
+    "number": 157,
+    "episode": 157,
+    "overview": "Bill Pexton, ein junger Marineleutnant, freundet sich bei den Vorbereitungen auf die Aufnahmeprüfung bei den Kampftauchern mit seinem Kameraden Mo Miller an.",
+    "thumbnail": "https://www.zdf.de/assets/falschesleben-102~1920x1080?cb=1696515723171",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:158",
+    "name": "Stadt, Land, Kuss",
+    "title": "Stadt, Land, Kuss",
+    "season": 1,
+    "number": 158,
+    "episode": 158,
+    "overview": "Rosamunde Pilcher Liebesfilm (2021). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt13625812/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:159",
+    "name": "Wie verhext",
+    "title": "Wie verhext",
+    "season": 1,
+    "number": 159,
+    "episode": 159,
+    "overview": "Im Kino ihres Vaters hat Grace Kent bereits als Sechsjährige jeden Film gesehen, der dort vorgeführt wurde. Kein Wunder, dass sie schon als junge Frau Kostümbildnerin werden will.",
+    "thumbnail": "https://www.zdf.de/assets/wie-verhext-102~1920x1080?cb=1751274370663",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:160",
+    "name": "Herzensläufe",
+    "title": "Herzensläufe",
+    "season": 1,
+    "number": 160,
+    "episode": 160,
+    "overview": "Für Jacky Davies ist das Gin-Brennen in der traditionellen Familiendestillerie mehr als nur ein Handwerk: Es ist die Passion der jungen Frau und eine Besessenheit.",
+    "thumbnail": "https://www.zdf.de/assets/herzenslaeufe-100~1920x1080?cb=1790922946174",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:161",
+    "name": "Der Stoff, aus dem Träume sind",
+    "title": "Der Stoff, aus dem Träume sind",
+    "season": 1,
+    "number": 161,
+    "episode": 161,
+    "overview": "Rosamunde Pilcher Liebesfilm (2021). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt15478660/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:162",
+    "name": "Im Siebten Himmel",
+    "title": "Im Siebten Himmel",
+    "season": 1,
+    "number": 162,
+    "episode": 162,
+    "overview": "Rebecca \"Becky\" Taylor ist frisch ordinierte Jung-Vikarin der Anglikanischen Gemeinschaft. Vor ihrem offiziellen Dienstantritt besucht sie die ihr zugeteilte Gemeinde in Cornwall.",
+    "thumbnail": "https://www.zdf.de/assets/rosamunde-pilcher-im-siebten-himmel-102~1920x1080?cb=1638535290427",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:163",
+    "name": "Vier Luftballons und ein Todesfall",
+    "title": "Vier Luftballons und ein Todesfall",
+    "season": 1,
+    "number": 163,
+    "episode": 163,
+    "overview": "Floristin Gwen ist Angestellte in einem Blumengroßhandel und wird von ihrem sympathischen Chef Joey umgarnt. Was der jungen Frau nicht unangenehm ist - ganz im Gegenteil.",
+    "thumbnail": "https://www.zdf.de/assets/vier-luftballons-und-ein-todesfall-100~1920x1080?cb=1790581314387",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:164",
+    "name": "Die Elster und der Kapitän",
+    "title": "Die Elster und der Kapitän",
+    "season": 1,
+    "number": 164,
+    "episode": 164,
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt18377966/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:165",
+    "name": "Liebe ist unberechenbar",
+    "title": "Liebe ist unberechenbar",
+    "season": 1,
+    "number": 165,
+    "episode": 165,
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt20124474/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:166",
+    "name": "Liebe und andere Schätze",
+    "title": "Liebe und andere Schätze",
+    "season": 1,
+    "number": 166,
+    "episode": 166,
+    "overview": "Kuratorin Mia Barlow ist praktisch in einem Museum groß geworden, seit Direktor Trevor Murphy und seine Frau, die Restauratorin Hannah, sie als Pflegekind bei sich aufgenommen haben.",
+    "thumbnail": "https://www.zdf.de/assets/liebe-und-andere-schaetze-100~1920x1080?cb=1779100936024",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:167",
+    "name": "Hochzeitstag",
+    "title": "Hochzeitstag",
+    "season": 1,
+    "number": 167,
+    "episode": 167,
+    "overview": "Rosamunde Pilcher Liebesfilm (2022). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt22038482/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:168",
+    "name": "Liebe ist die beste Therapie",
+    "title": "Liebe ist die beste Therapie",
+    "season": 1,
+    "number": 168,
+    "episode": 168,
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt26767892/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:169",
+    "name": "Wenn ich dich wiederfinde",
+    "title": "Wenn ich dich wiederfinde",
+    "season": 1,
+    "number": 169,
+    "episode": 169,
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt27349270/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:170",
+    "name": "Schlagzeile Liebe",
+    "title": "Schlagzeile Liebe",
+    "season": 1,
+    "number": 170,
+    "episode": 170,
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt28565529/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:171",
+    "name": "Amys Wunschkind",
+    "title": "Amys Wunschkind",
+    "season": 1,
+    "number": 171,
+    "episode": 171,
+    "overview": "Rosamunde Pilcher Liebesfilm (2023). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt29716178/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:172",
+    "name": "Frühstück bei Tessa",
+    "title": "Frühstück bei Tessa",
+    "season": 1,
+    "number": 172,
+    "episode": 172,
+    "overview": "Rosamunde Pilcher Liebesfilm (2024). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt30783580/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:173",
+    "name": "Verliebt in einen Butler",
+    "title": "Verliebt in einen Butler",
+    "season": 1,
+    "number": 173,
+    "episode": 173,
+    "overview": "Rosamunde Pilcher Liebesfilm (2024). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt33086345/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:174",
+    "name": "Jahrestag",
+    "title": "Jahrestag",
+    "season": 1,
+    "number": 174,
+    "episode": 174,
+    "overview": "Rosamunde Pilcher Liebesfilm (2025). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt34824149/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:175",
+    "name": "Wer immer du bist",
+    "title": "Wer immer du bist",
+    "season": 1,
+    "number": 175,
+    "episode": 175,
+    "overview": "Rosamunde Pilcher Liebesfilm (2025). Romantische Verwicklungen und große Gefühle vor der malerischen Kulisse Südenglands.",
+    "thumbnail": "https://images.metahub.space/poster/medium/tt38098292/img",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:176",
+    "name": "Einspruch für die Liebe",
+    "title": "Einspruch für die Liebe",
+    "season": 1,
+    "number": 176,
+    "episode": 176,
+    "overview": "Unter dem Motto \"Harte Arbeit zahlt sich aus\" hat sich Anwalt Bill Reynolds eine renommierte Kanzlei aufgebaut und den Ruf erarbeitet, fast alle Verfahren vor Gericht zu gewinnen.",
+    "thumbnail": "https://epg-image.zdf.de/fotobase-webdelivery/images/14639eee-55be-4062-8284-904f5faf3e73?layout=768x432",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:177",
+    "name": "Wo Liebe aufhört und wo sie beginnt",
+    "title": "Wo Liebe aufhört und wo sie beginnt",
+    "season": 1,
+    "number": 177,
+    "episode": 177,
+    "overview": "Kate liebt die Arbeit in ihrem kleinen Café, das sie mit ihrer Freundin Polly betreibt. Ihr großer Traum: Ein eigenes Literaturcafé. Doch aus Liebe zu ihrem Mann stellt sie diesen zurück.",
+    "thumbnail": "https://www.zdf.de/assets/hero-pilcher-wo-die-liebe-aufhoert-100~1920x1080?cb=1776694369640",
+    "rating": "6.0"
+  },
+  {
+    "id": "tt0907694:1:178",
+    "name": "Die Glücksbringerin",
+    "title": "Die Glücksbringerin",
+    "season": 1,
+    "number": 178,
+    "episode": 178,
+    "overview": "Schornsteinfegerin Clare Ridley gilt als Glücksbringerin in ihrem Ort. Doch plötzlich wird sie des Diebstahls verdächtigt, selbst von ihrer Jugendliebe Josh Harding.",
+    "thumbnail": "https://epg-image.zdf.de/fotobase-webdelivery/images/45cdebaf-8fbe-498c-aafd-57730994f4d4?layout=768x432",
+    "rating": "6.0"
+  }
+];
 const EPISODES = [
   {
     "id": "rp_001",
@@ -1408,6 +4792,24 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
 });
 
 builder.defineMetaHandler(async ({ type, id }) => {
+  // 1. Official Stremio Series (tt0907694) - Fixes "TBA" and fills real German titles & thumbnails
+  if (type === 'series' && id === 'tt0907694') {
+    return {
+      meta: {
+        id: 'tt0907694',
+        type: 'series',
+        name: 'Rosamunde Pilcher',
+        genres: ['Drama', 'Romance'],
+        poster: 'https://images.metahub.space/poster/medium/tt0907694/img',
+        background: 'https://images.metahub.space/background/medium/tt0907694/img',
+        description: 'Die beliebten Verfilmungen der Herzkino-Reihe des ZDF nach den Erzählungen und Romanen von Rosamunde Pilcher in Cornwall und Südengland.',
+        releaseInfo: '1993-',
+        videos: SERIES_VIDEOS
+      }
+    };
+  }
+
+  // 2. Custom Movie Catalog Items (rp_xxx)
   if (type === 'movie' && id.startsWith('rp_')) {
     const episode = EPISODES.find(ep => ep.id === id);
     if (episode) {
@@ -1422,6 +4824,7 @@ builder.defineMetaHandler(async ({ type, id }) => {
       };
     }
   }
+
   return { meta: null };
 });
 
@@ -1519,7 +4922,6 @@ async function searchMediathek(searchTitle) {
     });
 
     const results = resp.data?.result?.results || [];
-    // Only full length movies (> 40 minutes = 2400 seconds)
     return results.filter(r => (r.duration || 0) > 2400);
   } catch (err) {
     return [];
@@ -1545,51 +4947,67 @@ async function searchYouTubeFullMovies(searchTitle) {
     const data = JSON.parse(match[1]);
     const videos = findVideoRenderers(data);
 
-    // CRITICAL REQUIREMENT: Filter ONLY actual full films (at least 45 minutes = 2700s)
-    // Strictly ignores 4-minute previews, clips, and trailers!
-    const longVideos = videos.filter(v => v.seconds >= 2700);
+    // CRITICAL: Filter ONLY actual full films / parts (at least 40 minutes = 2400s)
+    // Excludes 4-minute previews, clips, trailers, and teasers!
+    const longVideos = videos.filter(v => v.seconds >= 2400);
     if (longVideos.length === 0) return [];
 
-    // Check title match
     const matched = longVideos.filter(v => isStrictTitleMatch(searchTitle, v.title));
-    return matched.slice(0, 2); // return up to 2 verified full films
+    return matched.slice(0, 3);
   } catch (err) {
     return [];
   }
 }
 
 // ============================================================================
-// 5. DYNAMIC STREAM HANDLER (HYBRID MEDIATHEK & VERIFIED FULL YOUTUBE FILMS)
+// 5. UNIFIED DYNAMIC STREAM HANDLER (SERIES & MOVIES)
 // ============================================================================
 builder.defineStreamHandler(async ({ type, id }) => {
-  if (type !== 'movie' || !id.startsWith('rp_')) {
+  let searchTitle = '';
+
+  // 1. Official Stremio Series episode request (e.g. tt0907694:1:6 or tt0907694:1:178)
+  if (type === 'series' && id.startsWith('tt0907694:')) {
+    const epEntry = SERIES_MAP[id];
+    if (epEntry) {
+      searchTitle = epEntry.name;
+    } else {
+      const epNum = id.split(':')[2];
+      const matchByNum = Object.values(SERIES_MAP).find(v => String(v.number) === String(epNum));
+      if (matchByNum) searchTitle = matchByNum.name;
+    }
+  }
+  // 2. Movie request by individual IMDb ID (e.g. tt0108240)
+  else if (type === 'movie' && id.startsWith('tt')) {
+    const epEntry = Object.values(SERIES_MAP).find(v => v.imdb_id === id);
+    if (epEntry) searchTitle = epEntry.name;
+  }
+  // 3. Custom catalog movie request (e.g. rp_001)
+  else if (id.startsWith('rp_')) {
+    const episode = EPISODES.find(ep => ep.id === id);
+    if (episode) searchTitle = episode.searchTitle || episode.name;
+  }
+
+  if (!searchTitle) {
     return { streams: [] };
   }
 
-  const episode = EPISODES.find(ep => ep.id === id);
-  if (!episode) {
-    return { streams: [] };
-  }
-
-  // Check cache first
+  // Check cache
   const cached = STREAM_CACHE.get(id);
   if (cached && cached.expiresAt > Date.now()) {
     return { streams: cached.streams };
   }
 
-  const coreTitle = cleanCoreTitle(episode.searchTitle || episode.name);
+  const coreTitle = cleanCoreTitle(searchTitle);
   const streams = [];
 
   try {
-    // Run Mediathek and YouTube full-movie searches in parallel
     const [mediathekList, ytList] = await Promise.all([
       searchMediathek(coreTitle),
       searchYouTubeFullMovies(coreTitle)
     ]);
 
-    // 1. Official German Broadcaster Streams (ZDF, 3sat, ORF, SRF)
+    // Official Broadcaster Streams (ZDF, 3sat, ORF, SRF)
     if (mediathekList.length > 0) {
-      // Prioritize standard audio over Audiodeskription
       const primary = mediathekList.find(m => !/Audiodeskription/i.test(m.title)) || mediathekList[0];
       const streamUrl = primary.url_video_hd || primary.url_video;
       if (streamUrl) {
@@ -1604,18 +5022,17 @@ builder.defineStreamHandler(async ({ type, id }) => {
       }
     }
 
-    // 2. Verified Full-Length YouTube Films (>45 min only)
+    // Verified YouTube Full Films / Parts (>= 40 min only)
     if (ytList.length > 0) {
       for (const yt of ytList) {
         streams.push({
           name: 'YouTube HD [' + yt.lengthText + ']',
-          title: yt.title + '\nVoller Spielfilm auf YouTube (' + yt.lengthText + ')',
+          title: yt.title + '\nSpielfilm auf YouTube (' + yt.lengthText + ')',
           ytId: yt.videoId
         });
       }
     }
 
-    // Cache results
     STREAM_CACHE.set(id, {
       streams,
       expiresAt: Date.now() + CACHE_TTL_MS
@@ -1623,7 +5040,7 @@ builder.defineStreamHandler(async ({ type, id }) => {
 
     return { streams };
   } catch (err) {
-    console.warn('[StreamResolver] Error resolving streams for ' + id + ':', err.message);
+    console.warn('[StreamResolver] Error for ' + id + ':', err.message);
     return { streams: [] };
   }
 });
@@ -1657,7 +5074,7 @@ module.exports = (req, res) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ZDF & YouTube Rosamunde Pilcher Collection</title>
+  <title>Rosamunde Pilcher - Stremio Addon</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f1015; color: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; }
     .card { background: #1a1c23; border: 1px solid #2d3139; border-radius: 12px; padding: 36px 28px; max-width: 580px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
@@ -1674,15 +5091,16 @@ module.exports = (req, res) => {
 <body>
   <div class="card">
     <h1>Rosamunde Pilcher Collection</h1>
-    <p>Streams all 169 Rosamunde Pilcher films directly from German public broadcaster servers (ZDF, 3sat, ORF) and verified full-length YouTube films (>45 min) in HD quality.</p>
+    <p>Streams all 169 Rosamunde Pilcher films directly inside the official Stremio series (tt0907694) from ZDF Mediathek and full-length YouTube films in HD.</p>
     <a class="btn" href="${stremioUrl}">Install in Stremio</a>
     <div class="manifest">
       Manifest URL: <br><br><code>${manifestUrl}</code>
     </div>
     <div class="info-box">
-      <h3>🟢 Official Mediathek + Verified Full Films</h3>
-      • Direct 1080p streams from ZDF, 3sat, and ORF.<br>
-      • Full YouTube movies verified by duration (>= 45 min). 4-minute previews/trailers are strictly excluded!
+      <h3>✨ Official Series Integration (tt0907694)</h3>
+      • Attached directly to Stremio's official "Rosamunde Pilcher" series.<br>
+      • Replaces "TBA" with full German titles, synopses, and photo thumbnails.<br>
+      • Streams live 1080p broadcast files from ZDF/3sat and verified full YouTube films (>40m).
     </div>
   </div>
 </body>
