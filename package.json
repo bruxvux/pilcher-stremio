@@ -1,7 +1,7 @@
 {
   "name": "rosamunde-pilcher-stremio-addon",
-  "version": "1.6.0",
-  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films integrated into official series (tt0907694) with ZDF Mediathek and full-length YouTube films",
+  "version": "1.7.0",
+  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (tt0907694) with 🟢 Green Circle visual indicators for active ZDF/3sat streams",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
