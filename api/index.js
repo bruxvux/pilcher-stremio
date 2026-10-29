@@ -226,16 +226,64 @@ builder.defineStreamHandler(async ({ type, id }) => {
 // ============================================================================
 // 6. VERCEL SERVERLESS EXPORT
 // ============================================================================
-// Polyfill createRouter() if not natively attached to builder.getInterface() in the SDK
+// Attach createRouter() to the prototype so that ANY call to builder.getInterface().createRouter() works
 const addonInterface = builder.getInterface();
+const proto = Object.getPrototypeOf(addonInterface);
+if (proto && typeof proto.createRouter !== 'function') {
+  proto.createRouter = function () {
+    return sdkGetRouter(this);
+  };
+}
 if (typeof addonInterface.createRouter !== 'function') {
   addonInterface.createRouter = () => sdkGetRouter(addonInterface);
 }
 
 const getRouter = builder.getInterface().createRouter();
+
 module.exports = (req, res) => {
-    getRouter(req, res, () => {
-        res.statusCode = 404;
-        res.end();
-    });
+  // If user visits the root URL in a browser, render a clean landing page with an install button
+  if (!req.url || req.url === '/' || req.url === '/index.html') {
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'pilcher-stremio-tfd7.vercel.app';
+    const manifestUrl = `https://${host}/manifest.json`;
+    const stremioUrl = `stremio://${host}/manifest.json`;
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(`<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZDF Rosamunde Pilcher Collection - Stremio Add-on</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f1015; color: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; }
+    .card { background: #1a1c23; border: 1px solid #2d3139; border-radius: 12px; padding: 36px 28px; max-width: 500px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    h1 { color: #8a5cf6; margin-top: 0; font-size: 1.6rem; }
+    p { color: #a0a5b5; line-height: 1.5; margin-bottom: 24px; }
+    .btn { display: block; background: #8a5cf6; color: #ffffff; text-decoration: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; transition: background 0.2s; margin-bottom: 20px; }
+    .btn:hover { background: #7c4ee8; }
+    .manifest { font-size: 0.85rem; color: #707585; word-break: break-all; }
+    code { background: #252833; padding: 4px 8px; border-radius: 4px; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>ZDF Rosamunde Pilcher Collection</h1>
+    <p>Streams Rosamunde Pilcher TV-movies directly from ZDFmediathek into Stremio.</p>
+    <a class="btn" href="${stremioUrl}">Install in Stremio</a>
+    <div class="manifest">
+      Manifest URL: <br><br><code>${manifestUrl}</code>
+    </div>
+  </div>
+</body>
+</html>`);
+    return;
+  }
+
+  // Handle all Stremio API endpoints (/manifest.json, /catalog/..., /meta/..., /stream/...)
+  getRouter(req, res, () => {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('Not found');
+  });
 };
