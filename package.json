@@ -1,7 +1,7 @@
 {
   "name": "rosamunde-pilcher-stremio-addon",
-  "version": "1.4.0",
-  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (1993-2026) with official ZDF/3sat/SRF Mediathek HD streaming",
+  "version": "1.5.0",
+  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films with official ZDF/3sat Mediathek and verified full-length YouTube films (>45 min)",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
