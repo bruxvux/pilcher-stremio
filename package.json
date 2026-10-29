@@ -18,7 +18,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@stremio/stremio-addon-sdk": "^1.6.14",
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "stremio-addon-sdk": "^1.6.14"
   }
 }
