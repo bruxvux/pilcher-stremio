@@ -1,7 +1,7 @@
 {
   "name": "rosamunde-pilcher-stremio-addon",
-  "version": "1.1.0",
-  "description": "Stremio add-on to stream Rosamunde Pilcher films directly from ZDFmediathek deployed on Vercel",
+  "version": "1.2.0",
+  "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (1993-2026) directly from German public broadcasters",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
@@ -12,6 +12,7 @@
     "stremio-addon",
     "zdf",
     "zdfmediathek",
+    "3sat",
     "rosamunde-pilcher",
     "vercel"
   ],
