@@ -1,6 +1,6 @@
 {
   "name": "rosamunde-pilcher-stremio-addon",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Complete Stremio add-on with 169 Rosamunde Pilcher films (tt0907694) with Czech & German titles, ⬇ Downloads, ⚡ ZDF, ▶ YouTube, Samsung TV safe",
   "main": "api/index.js",
   "scripts": {

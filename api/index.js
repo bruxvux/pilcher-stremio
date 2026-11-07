@@ -6,25 +6,17 @@ const axios = require('axios');
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '2.2.0',
+  version: '2.2.1',
   name: 'Rosamunde Pilcher (⚡ ZDF, ▶ YT & ⬇ Downloads)',
   description: 'Komplette Rosamunde Pilcher Sammlung (169 Verfilmungen) s českými a německými názvy. ⬇ = Vlastní stažené / Downloads, ⚡ = ZDFmediathek 1080p, ▶ = YouTube.',
   resources: ['catalog', 'meta', 'stream'],
-  types: ['series', 'movie'],
+  types: ['movie', 'series'],
   idPrefixes: ['tt0907694', 'tt', 'rp_'],
   catalogs: [
     {
-      type: 'series',
-      id: 'rp_zdf_series_catalog',
-      name: 'Rosamunde Pilcher (Komplette Serie ⚡▶⬇)',
-      extra: [
-        { name: 'search', isRequired: false }
-      ]
-    },
-    {
       type: 'movie',
       id: 'rp_zdf_catalog',
-      name: 'Rosamunde Pilcher (Einzelfilme ⚡▶⬇)',
+      name: 'Rosamunde Pilcher (Filmy ⚡▶⬇)',
       extra: [
         { name: 'search', isRequired: false }
       ]
@@ -6926,25 +6918,7 @@ const SERIES_MAP = {
 const builder = new addonBuilder(manifest);
 
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
-  // 1. Series Catalog
-  if (type === 'series' && id === 'rp_zdf_series_catalog') {
-    return {
-      metas: [
-        {
-          id: 'rp_series_complete',
-          type: 'series',
-          name: 'Rosamunde Pilcher (Komplette Serie ⚡▶⬇)',
-          poster: 'https://images.metahub.space/poster/medium/tt0907694/img',
-          background: 'https://images.metahub.space/background/medium/tt0907694/img',
-          description: 'Komplette Rosamunde Pilcher Sammlung (169 Verfilmungen / dílů). ⬇ = Vlastní stažené • ⚡ = ZDFmediathek 1080p • ▶ = YouTube.',
-          releaseInfo: '1993-',
-          genres: ['Drama', 'Romance']
-        }
-      ]
-    };
-  }
-
-  // 2. Movies Catalog
+  // Movies Catalog
   if (type === 'movie' && id === 'rp_zdf_catalog') {
     const downloads = await getDownloadsMap();
     let results = EPISODES.map(ep => {
