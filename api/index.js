@@ -6,7 +6,7 @@ const axios = require('axios');
 // ============================================================================
 const manifest = {
   id: 'community.rosamunde-pilcher-zdf',
-  version: '2.2.1',
+  version: '2.2.2',
   name: 'Rosamunde Pilcher (⚡ ZDF, ▶ YT & ⬇ Downloads)',
   description: 'Komplette Rosamunde Pilcher Sammlung (169 Verfilmungen) s českými a německými názvy. ⬇ = Vlastní stažené / Downloads, ⚡ = ZDFmediathek 1080p, ▶ = YouTube.',
   resources: ['catalog', 'meta', 'stream'],
@@ -6918,18 +6918,47 @@ const SERIES_MAP = {
 const builder = new addonBuilder(manifest);
 
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
-  // Movies Catalog
+  // Movies Catalog (Sorted by stream count & quality: Downloaded & ZDF > YouTube > None)
   if (type === 'movie' && id === 'rp_zdf_catalog') {
     const downloads = await getDownloadsMap();
+
+    function getQualityScore(hasDownload, hasZdf, hasYt) {
+      let score = 0;
+      // Stream count bonus: 1000 points per available stream
+      const count = (hasDownload ? 1 : 0) + (hasZdf ? 1 : 0) + (hasYt ? 1 : 0);
+      score += count * 1000;
+
+      // Quality bonus: Downloaded (500) and ZDF (300) are top tier, YouTube is (50)
+      if (hasDownload) score += 500;
+      if (hasZdf) score += 300;
+      if (hasYt) score += 50;
+
+      return score;
+    }
+
     let results = EPISODES.map(ep => {
       const epNum = ep.episode || parseInt((ep.id.match(/\d+/) || [0])[0], 10);
       const downloadEntry = findDownload(epNum, ep.searchTitle, ep.titleCs, downloads);
       const hasDownload = Boolean(downloadEntry);
+      const hasZdf = ep.name.includes('⚡') || (ep.description && ep.description.includes('[OFFICIAL]'));
+      const hasYt = ep.name.includes('▶') || (ep.description && ep.description.includes('[YOUTUBE]'));
+
       const prefix = hasDownload ? '⬇' + (ep.name.startsWith('⚡') || ep.name.startsWith('▶') ? '' : ' ') : '';
+      const score = getQualityScore(hasDownload, hasZdf, hasYt);
+
       return {
         ...ep,
-        name: prefix + ep.name
+        name: prefix + ep.name,
+        score
       };
+    });
+
+    // Sort by stream count & quality score descending, then by episode number
+    results.sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return (a.episode || 0) - (b.episode || 0);
     });
 
     if (extra && extra.search) {
