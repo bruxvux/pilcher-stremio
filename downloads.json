@@ -1,4 +1,4 @@
 {
-  "_comment": "Add your downloaded episode links here. Supported keys: Episode number (e.g. '6'), Czech title ('Léto u moře'), German title ('Sommer am Meer'), or scene filename. Value can be a direct streaming/download URL (e.g. Real-Debrid, Google Drive, direct HTTP) or an object with custom title.",
-  "6": "https://example.com/downloads/Rosamunde.Pilcher.E06.Sommer.am.Meer.mp4"
+  "Rosamunde Pilcher: Falešná Jeptiška": "https://bruxvux.cz/rosamunde/Rosamunde pilcher falešná jeptiška.mp4",
+  "Rosamunde Pilcher: Nový Začátek": "https://bruxvux.cz/rosamunde/Rosamunde pilcher nový začátek.mp4"
 }
